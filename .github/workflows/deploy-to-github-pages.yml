@@ -28,7 +28,6 @@ jobs:
         cache: 'npm'
     - run: npm ci
     - run: npm run build --if-present
-    - run: npm test
     - name: GitHub Pages
       # You may pin to the exact commit or the version.
       # uses: crazy-max/ghaction-github-pages@eb08c35b9fab86751edfff4e55cd5cde35ff0e52
@@ -61,6 +60,6 @@ jobs:
         # Allow Jekyll to build your site
         # jekyll: # optional, default is true
         # If enabled, nothing will be pushed
-        ¢ dry_run: # optional, default is false
+        # dry_run: # optional, default is false
         # Enable verbose output
         # verbose: # optional, default is false
