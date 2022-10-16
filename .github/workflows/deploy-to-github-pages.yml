@@ -1,0 +1,66 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Node.js CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14.x, 16.x, 18.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: npm ci
+    - run: npm run build --if-present
+    - run: npm test
+    - name: GitHub Pages
+      # You may pin to the exact commit or the version.
+      # uses: crazy-max/ghaction-github-pages@eb08c35b9fab86751edfff4e55cd5cde35ff0e52
+      uses: crazy-max/ghaction-github-pages@v3.0.0
+      with:
+        # Git domain (default github.com)
+        # domain: # optional, default is github.com
+        # GitHub repository where assets will be deployed (default $GITHUB_REPOSITORY)
+        # repo: # optional
+        # Git branch where assets will be deployed
+        # target_branch: # optional, default is gh-pages
+        # Create incremental commit instead of doing push force
+        # keep_history: # optional, default is false
+        # Allow an empty commit to be created
+        # allow_empty_commit: # optional, default is true
+        # Build directory to deploy
+        build_dir: dist
+        # Whether to treat build_dir as an absolute path
+        # absolute_build_dir: # optional, default is false
+        # If enabled, the content of symbolic links will be copied
+        # follow_symlinks: # optional, default is false
+        # The committer name and email address
+        # committer: # optional
+        # The author name and email address
+        # author: # optional
+        # Commit message
+        # commit_message: # optional
+        # Write the given domain name to the CNAME file
+        # fqdn: # optional
+        # Allow Jekyll to build your site
+        # jekyll: # optional, default is true
+        # If enabled, nothing will be pushed
+        ¢ dry_run: # optional, default is false
+        # Enable verbose output
+        # verbose: # optional, default is false
