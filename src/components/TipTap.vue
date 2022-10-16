@@ -300,15 +300,6 @@ export default {
         TableHeader,
         TableCell,
       ],
-      content: `
-        <p>
-          This is still the text editor you’re used to, but enriched with node views.
-        </p>
-        
-        <p>
-          Did you see that? That’s a Vue component. We are really living in the future.
-        </p>
-      `,
       onUpdate: () => {
         this.$emit("update:modelValue", this.editor.getJSON().content);
         this.updateNodeTree();

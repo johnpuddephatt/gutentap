@@ -1,12 +1,12 @@
 <template>
-  <node-view-wrapper class="border-2 border-slate-400 rounded p-6">
+  <node-view-wrapper class="relative border-2 border-slate-400 rounded p-6">
     <span class="label">Vue Component</span>
 
     <div class="content">
-      <node-view-content class="bg-white p-2 border-2 rounded h-12" />
+      <node-view-content class="bg-white p-2 border-2 rounded h-14" />
 
       <button
-        class="border-2 border-slate-500 rounded px-2 mt-2"
+        class="border-2 border-slate-400 rounded px-2 mt-2"
         contenteditable="false"
         @click="increase"
       >
