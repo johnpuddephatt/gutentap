@@ -1,26 +1,31 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div class="h-screen grid grid-cols-3">
+    <tiptap
+      class="col-span-2 my-32 prose xl:prose-xl text-slate-600 max-w-none"
+      v-model="content"
+    />
+    <pre class="bg-slate-600 text-white p-4 overflow-y-auto text-sm">{{
+      content
+    }}</pre>
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Tiptap from "./components/TipTap.vue";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    HelloWorld
-  }
-}
+    Tiptap,
+  },
+  data() {
+    return {
+      content: null,
+    };
+  },
+};
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+@import "style.css";
 </style>

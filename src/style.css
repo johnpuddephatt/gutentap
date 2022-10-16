@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+[disabled] {
+  @apply text-gray-300 cursor-default;
+}
+
+[data-block-width="wide"] {
+  @apply max-w-6xl;
+}
+
+[data-block-width="full"] {
+  @apply max-w-none;
+}
