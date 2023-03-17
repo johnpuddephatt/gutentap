@@ -23,6 +23,7 @@ export default function () {
         command: (editor) => {
           editor.chain().focus().setTextAlign("right").run();
         },
+
         isActiveTest: (editor) => editor.isActive({ textAlign: "right" }),
       },
     ],
@@ -33,6 +34,8 @@ export default function () {
         command: (editor) => {
           editor.chain().focus().setBlockWidth("normal").run();
         },
+        // isPossibleTest: (editor) =>
+        // editor.can().chain().focus().setBlockWidth("normal").run(),
         isActiveTest: (editor) => editor.isActive({ blockWidth: "normal" }),
       },
       {
@@ -41,6 +44,8 @@ export default function () {
         command: (editor) => {
           editor.chain().focus().setBlockWidth("wide").run();
         },
+        // isPossibleTest: (editor) =>
+        // editor.can().chain().focus().setBlockWidth("wide").run(),
         isActiveTest: (editor) => editor.isActive({ blockWidth: "wide" }),
       },
       {
@@ -49,6 +54,8 @@ export default function () {
         command: (editor) => {
           editor.chain().focus().setBlockWidth("full").run();
         },
+        // isPossibleTest: (editor) =>
+        // editor.can().chain().focus().setBlockWidth("full").run(),
         isActiveTest: (editor) => editor.isActive({ blockWidth: "full" }),
       },
     ],

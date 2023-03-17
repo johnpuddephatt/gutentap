@@ -1,22 +1,5 @@
 <template>
   <div>
-    <!--
-  <div v-if="editor">
-    <button @click="editor.chain().focus().setBlockWidth('normal').run()" :class="{ 'bg-black text-white': editor.isActive({ blockWidth: 'normal' }) }">
-      <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="components-menu-items__item-icon" aria-hidden="true" focusable="false"><path d="M5 15h14V9H5v6zm0 4.8h14v-1.5H5v1.5zM5 4.2v1.5h14V4.2H5z"></path></svg>
-      Normal width
-    </button>
-    <button @click="editor.chain().focus().setBlockWidth('wide').run()" :class="{ 'bg-black text-white': editor.isActive({ blockWidth: 'wide' }) }">
-     <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="components-menu-items__item-icon" aria-hidden="true" focusable="false"><path d="M5 9v6h14V9H5zm11-4.8H8v1.5h8V4.2zM8 19.8h8v-1.5H8v1.5z"></path></svg>
-     Wide width
-    </button>
-    <button @click="editor.chain().focus().setBlockWidth('full').run()" :class="{ 'bg-black text-white': editor.isActive({ blockWidth: 'full' }) }">
-     <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="components-menu-items__item-icon" aria-hidden="true" focusable="false"><path d="M5 4v11h14V4H5zm3 15.8h8v-1.5H8v1.5z"></path></svg>
-     Full width
-    </button>
-  </div>
--->
-
     <bubble-menu
       @dragend="endDragging($event)"
       :draggable="dragging"
@@ -28,12 +11,12 @@
         maxWidth: 'none',
         placement: 'top-start',
         duration: 100,
-        getReferenceClientRect: getBubbleMenuPosition,
+        getReferenceClientRect: getTippyCoords,
       }"
     >
       <div class="flex flex-row">
         <button
-          class="p-2 h-12"
+          class="p-2 h-12 hover:bg-slate-50 rounded"
           :class="{ 'cursor-grab': !dragging, 'cursor-grabbing': dragging }"
           aria-label="Drag"
           @mousedown="startDragging($event)"
@@ -58,12 +41,12 @@
 
         <div class="p-2 -ml-2 group relative" v-if="!dragging">
           <button
-            class="rounded p-1 group-focus-within:bg-slate-600 group-focus-within:text-white"
+            class="hover:bg-slate-50 rounded p-1 group-focus-within:bg-slate-600 group-focus-within:text-white"
             aria-label="Convert"
           >
             <span
               v-html="
-                blockTools.find((tool) => tool.name == getTopLevelBlockType())
+                blockTools.find((tool) => tool.name == getTopLevelNodeType())
                   ?.icon
               "
             ></span>
@@ -129,14 +112,16 @@
         </div>
       </div>
 
-      <div class="flex flex-row" v-if="!dragging">
+      <div class="flex flex-row p-2 gap-1" v-if="!dragging">
         <div
           v-for="(alignmentToolGroup, key) in alignmentTools"
           :key="key"
-          class="p-2 group relative"
+          class="group relative"
         >
+          <!--
+            Note we’re for-ing here even though only one button is displayed... we check if the current block has a blockWidth to decide whether to show the dropdown trigger -->
           <button
-            class="p-1 rounded group-focus-within:bg-slate-600 group-focus-within:text-white"
+            class="hover:bg-slate-50 p-1 rounded group-focus-within:bg-slate-600 group-focus-within:text-white"
             :key="tool.title"
             aria-label="Change block width"
             v-for="tool in alignmentToolGroup.filter((tool) =>
@@ -164,23 +149,27 @@
 
       <div
         v-if="
-          blockTools.find((tool) => tool.name == getTopLevelBlockType())?.tools
+          !dragging &&
+          blockTools.find((tool) => tool.name == getTopLevelNodeType())?.tools
             ?.length
         "
-        class="p-2 gap-1 flex flex-row"
+        class="gap-1 flex flex-row items-center p-2"
       >
         <button
-          class="p-1"
+          class="p-1 hover:bg-slate-50"
           :title="tool.title"
           :disabled="tool.isDisabledTest?.call(0, editor)"
           :class="{
-            [tool.isActiveClass ?? 'bg-slate-600 text-white rounded']:
-              tool.isActiveTest?.call(0, editor),
+            [tool.isActiveClass ??
+            'bg-slate-600 hover:bg-slate-700 text-white rounded']: tool.isActiveTest?.call(
+              0,
+              editor
+            ),
           }"
           @click="tool.command(editor)"
           :key="tool.name"
           v-for="tool in blockTools.find(
-            (tool) => tool.name == getTopLevelBlockType()
+            (tool) => tool.name == getTopLevelNodeType()
           )?.tools"
         >
           <span v-html="tool.icon"></span>
@@ -192,31 +181,47 @@
           :key="tool.title"
           :aria-label="`Toggle ${tool.title}`"
           v-for="tool in inlineTools"
-          class="p-1 block"
+          class="hover:bg-slate-50 p-1 block"
           @click="tool.command(editor)"
           :class="{
-            [tool.isActiveClass ?? 'bg-slate-600 text-white rounded']:
+            [tool.isActiveClass ??
+            'bg-slate-600 hover:bg-slate-700 text-white rounded']:
               tool.isActiveTest(editor),
           }"
         >
           <span v-html="tool.icon"></span>
         </button>
       </div>
+      <div
+        v-if="
+          editor && editor.can().deleteNode(getTopLevelNodeType()) && !dragging
+        "
+        class="p-2 gap-1 flex flex-row items-center"
+      >
+        <button
+          class="hover:bg-slate-50 p-1 flex-row gap-2 flex capitalize items-center"
+          aria-label="Delete block"
+          title="Delete block"
+          @click="editor.commands.deleteNode(getTopLevelNodeType())"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+            />
+          </svg>
+          {{ getTopLevelNodeType() }}
+        </button>
+      </div>
     </bubble-menu>
-
-    <!-- 
-    <button @click="editor.chain().focus().setHorizontalRule().run()">
-      horizontal rule
-    </button>
-    <button @click="editor.chain().focus().setHardBreak().run()">
-      hard break
-    </button>
-    <button @click="editor.chain().focus().undo().run()" :disabled="!editor.can().chain().focus().undo().run()">
-      undo
-    </button>
-    <button @click="editor.chain().focus().redo().run()" :disabled="!editor.can().chain().focus().redo().run()">
-      redo
-    </button> -->
 
     <editor-content ref="editor" :editor="editor" />
 
@@ -241,8 +246,14 @@ import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
 import TableRow from "@tiptap/extension-table-row";
 import TextAlign from "@tiptap/extension-text-align";
-
-import { DragNode, MoveNode } from "../utils/pm-utils.js";
+import Blockquote from "@tiptap/extension-blockquote";
+import {
+  DragNode,
+  MoveNode,
+  GetTopLevelBlockCoords,
+  GetTopLevelNode,
+  GetNodeTree,
+} from "../utils/pm-utils.js";
 import BlockWidth from "../extensions/block-width";
 import VueComponent from "../extensions/vue-component";
 
@@ -276,7 +287,12 @@ export default {
   mounted() {
     this.editor = new Editor({
       extensions: [
-        StarterKit,
+        StarterKit.configure({
+          blockquote: false,
+        }),
+        Blockquote.extend({
+          content: "paragraph*",
+        }),
         VueComponent,
         Commands.configure({
           suggestion,
@@ -288,7 +304,7 @@ export default {
           placeholder: "Write something…",
         }),
         BlockWidth.configure({
-          types: ["heading", "paragraph"],
+          types: ["paragraph", "horizontalRule", "blockquote"],
         }),
         TextAlign.configure({
           types: ["heading", "paragraph"],
@@ -296,13 +312,20 @@ export default {
         Table.configure({
           resizable: true,
         }),
-        TableRow,
-        TableHeader,
-        TableCell,
+        TableRow.extend({
+          allowGapCursor: false,
+        }),
+        TableHeader.extend({
+          content: "(inline|hardBreak?)*",
+        }),
+        TableCell.extend({
+          content: "(inline|hardBreak?)*",
+          isolating: false,
+        }),
       ],
       onUpdate: () => {
         this.$emit("update:modelValue", this.editor.getJSON().content);
-        this.updateNodeTree();
+        this.nodeTree = GetNodeTree(this.editor.view);
       },
     });
     this.editor.content = this.modelValue;
@@ -313,6 +336,10 @@ export default {
   },
 
   methods: {
+    getTippyCoords() {
+      return GetTopLevelBlockCoords(this.editor.view);
+    },
+
     startDragging(event) {
       let coords = { left: event.clientX, top: event.clientY + 48 };
       this.draggedNodePosition = this.editor.view.posAtCoords(coords).pos;
@@ -350,39 +377,8 @@ export default {
       });
     },
 
-    getTopLevelBlockType() {
-      const selectionStart = this.editor.view.state.selection.$from;
-      return selectionStart.node(1)?.type.name;
-    },
-
-    updateNodeTree() {
-      let nodes = [];
-      const selectionStart = this.editor.view.state.selection.$from;
-
-      let depth = selectionStart.depth;
-
-      while (depth > 0) {
-        nodes.push(selectionStart.node(depth).type.name);
-        depth--;
-      }
-
-      this.nodeTree = nodes;
-    },
-
-    getBubbleMenuPosition() {
-      const selectionStart = this.editor.view.state.selection.$from;
-      let parentNode = this.editor.view.domAtPos(
-        selectionStart.posAtIndex(0, 1)
-      ).node;
-      // Sometimes we get a node that isn't the top-level parent; e.g. codeBlock gives us the <code> not the wrapping <pre>
-
-      while (
-        parentNode != this.editor.view.dom &&
-        parentNode.parentNode != this.editor.view.dom
-      ) {
-        parentNode = parentNode.parentNode;
-      }
-      return parentNode.getBoundingClientRect();
+    getTopLevelNodeType() {
+      return GetTopLevelNode(this.editor.view)?.type.name;
     },
 
     canMoveNodeDown() {
@@ -419,9 +415,21 @@ export default {
   @apply block;
 }
 
+.ProseMirror table {
+  @apply table-fixed;
+}
+
+.ProseMirror table p {
+  @apply my-0;
+}
+
+.ProseMirror table p + p {
+  @apply mt-2;
+}
+
 .ProseMirror td,
 .ProseMirror th {
-  @apply border border-2;
+  @apply p-2 border border-2;
 }
 
 .ProseMirror th {
@@ -434,5 +442,23 @@ export default {
   color: #adb5bd;
   pointer-events: none;
   height: 0;
+}
+
+hr {
+  height: auto;
+  border-top-width: 4px !important;
+  border-radius: 10px !important;
+}
+
+hr:before {
+  content: "♪♪";
+}
+
+hr:after {
+  content: " This is an <hr> element";
+}
+
+.ProseMirror-selectednode {
+  outline: 2px solid lightblue;
 }
 </style>

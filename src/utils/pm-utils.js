@@ -3,6 +3,56 @@ import { Slice, Fragment } from "prosemirror-model";
 import { ReplaceStep } from "prosemirror-transform";
 import { Selection } from "prosemirror-state";
 
+export const GetTopLevelBlockCoords = function (view) {
+  const $pos = view.state.selection.$from;
+  let from = 0;
+  for (let depth = $pos.depth; depth > 0; depth -= 1) {
+    from = $pos.before(depth);
+  }
+  let coords = view.coordsAtPos(from);
+  return new DOMRect(coords.left, coords.top, 0, 0);
+};
+
+export const GetTopLevelNode = function (view) {
+  const selectionStart = view.state.selection.$from;
+  if (selectionStart.node(1) == null && view.lastSelectedViewDesc) {
+    return view.lastSelectedViewDesc.node;
+  }
+  return selectionStart.node(1);
+};
+
+export const GetNodeTree = function (view) {
+  let nodes = [];
+  const selectionStart = view.state.selection.$from;
+
+  let depth = selectionStart.depth;
+
+  while (depth > 0) {
+    nodes.push(selectionStart.node(depth).type.name);
+    depth--;
+  }
+
+  return nodes;
+};
+
+export const GetTopLevelBlock = function (editor) {
+  const selectionStart = editor.view.state.selection.$from;
+  let parentNode = editor.view.domAtPos(selectionStart.posAtIndex(0, 1)).node;
+  if (parentNode == editor.view.dom) {
+    return editor.view.lastSelectedViewDesc?.nodeDOM;
+  }
+
+  // Sometimes we get a node that isn't the top-level parent; e.g. codeBlock gives us the <code> not the wrapping <pre>
+  while (
+    parentNode != editor.view.dom &&
+    parentNode.parentNode != editor.view.dom
+  ) {
+    parentNode = parentNode.parentNode;
+  }
+
+  return parentNode;
+};
+
 let mapChildren = function (node, callback) {
   const array = [];
   for (let i = 0; i < node.childCount; i++) {
@@ -22,7 +72,6 @@ export const DragNode = function ({
   let targetResolved = state.doc.resolve(targetNodePosition);
   let draggedNode = state.doc.resolve(draggedNodePosition).node(1);
   let targetNode = targetResolved.node(1);
-  console.log(targetResolved.node(1));
   let tr = view.state.tr;
   const parent = targetResolved.node(0);
   const parentPos = targetResolved.start(0);
