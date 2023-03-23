@@ -273,6 +273,7 @@ import {
   GetTableRowCoords,
   GetTopLevelNode,
 } from "../utils/pm-utils.js";
+
 import BlockWidth from "../extensions/block-width";
 import VueComponent from "../extensions/vue-component";
 import { TrailingNode } from "../extensions/trailing-node";
@@ -362,6 +363,7 @@ export default {
         }),
         TableHeader.extend({
           content: "(inline|hardBreak?)*",
+          isolating: false,
         }),
         TableCell.extend({
           content: "(inline|hardBreak?)*",
