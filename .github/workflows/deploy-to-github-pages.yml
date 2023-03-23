@@ -34,7 +34,7 @@ jobs:
       uses: crazy-max/ghaction-github-pages@v3.0.0
       with:
         # Git domain (default github.com)
-        # domain: # optional, default is github.com
+        domain: gutentap.letsdance.agency # optional, default is github.com
         # GitHub repository where assets will be deployed (default $GITHUB_REPOSITORY)
         # repo: # optional
         # Git branch where assets will be deployed
