@@ -5,12 +5,48 @@ import { Selection } from "prosemirror-state";
 
 export const GetTopLevelBlockCoords = function (view) {
   const $pos = view.state.selection.$from;
-  let from = 0;
-  for (let depth = $pos.depth; depth > 0; depth -= 1) {
-    from = $pos.before(depth);
-  }
+  let from = $pos.before(1);
   let coords = view.coordsAtPos(from);
   return new DOMRect(coords.left, coords.top, 0, 0);
+};
+
+export const GetTableRowCoords = function (view) {
+  const pos = view.state.selection.$from;
+  let depth = pos.depth;
+  while (depth > 1) {
+    if (pos.node(depth).type.name == "tableRow") break;
+    depth--;
+  }
+  let from = pos.before(depth);
+  let rect = view.nodeDOM(from).getBoundingClientRect();
+  return new DOMRect(rect.x, rect.y, rect.width, rect.height);
+};
+
+export const GetTableColumnCoords = function (view) {
+  const pos = view.state.selection.$from;
+  let depth = pos.depth,
+    cellDepth = 0,
+    tableDepth = 0;
+  while (depth > 0) {
+    if (
+      pos.node(depth).type.name == "tableCell" ||
+      pos.node(depth).type.name == "tableHeader"
+    ) {
+      cellDepth = depth;
+    }
+    if (pos.node(depth).type.name == "table") {
+      tableDepth = depth;
+      break;
+    }
+    depth--;
+  }
+  if (!(tableDepth && cellDepth)) {
+    return false;
+  }
+  let cellRect = view.nodeDOM(pos.before(cellDepth)).getBoundingClientRect();
+  let tableRect = view.nodeDOM(pos.before(tableDepth)).getBoundingClientRect();
+
+  return new DOMRect(cellRect.x, tableRect.y, cellRect.width, tableRect.height);
 };
 
 export const GetTopLevelNode = function (view) {
@@ -24,14 +60,11 @@ export const GetTopLevelNode = function (view) {
 export const GetNodeTree = function (view) {
   let nodes = [];
   const selectionStart = view.state.selection.$from;
-
   let depth = selectionStart.depth;
-
   while (depth > 0) {
     nodes.push(selectionStart.node(depth).type.name);
     depth--;
   }
-
   return nodes;
 };
 
@@ -96,25 +129,19 @@ export const MoveNode = function ({ view, dir, currentResolved }) {
   if (!currentResolved) {
     return false;
   }
-
   let tr = view.state.tr;
-
-  //   const decoration = Decoration.node(
-  //     currentResolved.before(),
-  //     currentResolved.after(),
-  //     { class: "current-element" }
-  //   );
-  //   tr.step(DecorationSet.create(view.state.doc, [decoration]));
-  //   view.dispatch(tr);
-
   const isDown = dir === "DOWN";
-  const currentNode = currentResolved.node(1);
+  const currentNode = currentResolved.node(1) || currentResolved.nodeAfter;
   const parentDepth = 0;
   const parent = currentResolved.node(parentDepth);
   const parentPos = currentResolved.start(parentDepth);
 
   const arr = mapChildren(parent, (node) => node);
   let index = arr.indexOf(currentNode);
+
+  if (index == -1) {
+    return false;
+  }
 
   let swapWithIndex = isDown ? index + 1 : index - 1;
 

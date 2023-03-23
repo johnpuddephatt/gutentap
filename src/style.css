@@ -7,9 +7,37 @@
 }
 
 [data-block-width="wide"] {
-  @apply max-w-6xl;
+  @apply max-w-4xl;
 }
 
 [data-block-width="full"] {
   @apply max-w-none;
+}
+
+.resize-cursor {
+  cursor: col-resize;
+}
+
+.ProseMirror table .column-resize-handle {
+  position: absolute;
+  right: -2px;
+  top: 0;
+  bottom: -2px;
+  width: 4px;
+  background-color: #adf;
+  pointer-events: none;
+}
+
+.ProseMirror table td,
+.ProseMirror table th {
+  min-width: 1em;
+  border: 2px solid #ced4da;
+  padding: 3px 5px;
+  vertical-align: top;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.hide-empty:empty {
+  display: none;
 }

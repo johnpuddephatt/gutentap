@@ -15,6 +15,7 @@ export default function () {
       //   convertCommand: (editor) => {
       //     editor.chain().focus().setParagraph().run();
       //   },
+      hasInlineTools: false,
       isActiveTest: (editor) => editor.isActive("vueComponent"),
     },
     {
@@ -27,6 +28,8 @@ export default function () {
       convertCommand: (editor) => {
         editor.chain().focus().setParagraph().run();
       },
+      canBeConverted: true,
+      hasInlineTools: true,
       isActiveTest: (editor) => editor.isActive("paragraph"),
     },
     {
@@ -44,6 +47,8 @@ export default function () {
       convertCommand: (editor) => {
         editor.chain().focus().toggleHeading({ level: 2 }).run();
       },
+      canBeConverted: true,
+      hasInlineTools: true,
       isActiveTest: (editor) => editor.isActive("heading"),
       tools: [
         {
@@ -77,7 +82,7 @@ export default function () {
     },
     {
       title: "List",
-      name: "bulletList",
+      name: "list",
       icon: '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" stroke-width="0" stroke="currentColor" fill="currentColor"  focusable="false"><path d="M4 4v1.5h16V4H4zm8 8.5h8V11h-8v1.5zM4 20h16v-1.5H4V20zm4-8c0-1.1-.9-2-2-2s-2 .9-2 2 .9 2 2 2 2-.9 2-2z"></path></svg>',
       insertCommand: ({ editor, range }) => {
         editor.chain().focus().deleteRange(range).toggleBulletList().run();
@@ -85,6 +90,7 @@ export default function () {
       convertCommand: (editor) => {
         editor.chain().focus().toggleBulletList().run();
       },
+      hasInlineTools: true,
       isActiveTest: (editor) =>
         editor.isActive("bulletList") || editor.isActive("orderedList"),
       tools: [
@@ -93,7 +99,7 @@ export default function () {
           name: "bulletList",
           icon: '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" stroke-width="1"  fill="currentColor"  focusable="false"><path d="M4 4v1.5h16V4H4zm8 8.5h8V11h-8v1.5zM4 20h16v-1.5H4V20zm4-8c0-1.1-.9-2-2-2s-2 .9-2 2 .9 2 2 2 2-.9 2-2z"></path></svg>',
           command: (editor) => {
-            editor.chain().focus().toggleOrderedList().run();
+            editor.chain().focus().toggleBulletList().run();
           },
           isActiveTest: (editor) => editor.isActive("bulletList"),
         },
@@ -102,8 +108,7 @@ export default function () {
           name: "orderedList",
           icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5"  stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M0 0h24v24H0z" stroke="none"/><path d="M11 6h9M11 12h9M12 18h8M4 16a2 2 0 114 0c0 .591-.5 1-1 1.5L4 20h4M6 10V4L4 6"/></svg>',
           command: (editor) => {
-            console.log(editor);
-            // editor.chain().focus().toggleOrderedList().run();
+            editor.chain().focus().toggleOrderedList().run();
           },
           isActiveTest: (editor) => editor.isActive("orderedList"),
         },
@@ -134,6 +139,7 @@ export default function () {
       insertCommand: ({ editor, range }) => {
         editor.chain().focus().deleteRange(range).toggleCodeBlock().run();
       },
+      hasInlineTools: false,
       convertCommand: (editor) => {
         editor.chain().focus().toggleCodeBlock().run();
       },
@@ -146,6 +152,9 @@ export default function () {
       insertCommand: ({ editor, range }) => {
         editor.chain().focus().deleteRange(range).toggleBlockquote().run();
       },
+      hasInlineTools: true,
+      canBeConverted: true,
+
       convertCommand: (editor) => {
         editor.chain().focus().toggleBlockquote().run();
       },
@@ -158,6 +167,7 @@ export default function () {
       insertCommand: ({ editor, range }) => {
         editor.chain().focus().deleteRange(range).setHorizontalRule().run();
       },
+      hasInlineTools: false,
       isActiveTest: (editor) => editor.isActive("horizontalRule"),
     },
 
@@ -173,16 +183,32 @@ export default function () {
           .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
           .run();
       },
+      hasInlineTools: true,
       isActiveTest: (editor) => editor.isActive("table"),
       tools: [
         {
-          title: "Bullet list",
-          name: "bulletList",
-          icon: '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" stroke-width="1"  fill="currentColor"  focusable="false"><path d="M4 4v1.5h16V4H4zm8 8.5h8V11h-8v1.5zM4 20h16v-1.5H4V20zm4-8c0-1.1-.9-2-2-2s-2 .9-2 2 .9 2 2 2 2-.9 2-2z"></path></svg>',
+          title: "Toggle header row",
+          name: "toggleHeaderRow",
+          icon: '<svg xmlns="http://www.w3.org/2000/svg" width="21" height="16.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 21 16.5"><path stroke-linecap="round" stroke-linejoin="round" d="M1.875 15.75h17.25m-17.25 0A1.125 1.125 0 0 1 .75 14.625m1.125 1.125h3.381c.621 0 1.125-.504 1.125-1.125m-5.631 0V1.875m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V1.875m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75H7.506a1.125 1.125 0 0 1-1.125-1.125M20.25 1.875c0-.621-.504-1.125-1.125-1.125H1.875C1.254.75.75 1.254.75 1.875m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M.75 1.875v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h3.381c.748 0 1.125.504 1.125 1.125M1.875 4.5C1.254 4.5.75 5.004.75 5.625v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75H7.506c-.62 0-1.125.504-1.125 1.125M19.125 4.5c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h3.381m-3.381 0C1.254 8.25.75 8.754.75 9.375v1.5c0 .621.504 1.125 1.125 1.125m4.506-4.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125m1.125-1.125c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M7.506 8.25h11.619m-11.619 0c-.62 0-1.125.504-1.125 1.125M19.125 8.25c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h3.381m1.125-1.125v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125m1.125-1.125c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125m0 1.5v-1.5m0 0c0-.621.504-1.125 1.125-1.125m0 0h11.619"/><path fill="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="0" d="M.737.877H20.212V4.182H.737z" /></svg>',
           command: (editor) => {
-            editor.chain().focus().toggleOrderedList().run();
+            editor.commands.toggleHeaderRow();
           },
-          isActiveTest: (editor) => editor.isActive("bulletList"),
+        },
+        {
+          title: "Toggle header column",
+          name: "toggleHeaderColumn",
+          icon: '<svg xmlns="http://www.w3.org/2000/svg" width="21" height="16.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 21 16.5"><path stroke-linecap="round" stroke-linejoin="round" d="M1.875 15.75h17.25m-17.25 0A1.125 1.125 0 0 1 .75 14.625m1.125 1.125h3.381c.621 0 1.125-.504 1.125-1.125m-5.631 0V1.875m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V1.875m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75H7.506a1.125 1.125 0 0 1-1.125-1.125M20.25 1.875c0-.621-.504-1.125-1.125-1.125H1.875C1.254.75.75 1.254.75 1.875m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M.75 1.875v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h3.381c.748 0 1.125.504 1.125 1.125M1.875 4.5C1.254 4.5.75 5.004.75 5.625v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75H7.506c-.62 0-1.125.504-1.125 1.125M19.125 4.5c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h3.381m-3.381 0C1.254 8.25.75 8.754.75 9.375v1.5c0 .621.504 1.125 1.125 1.125m4.506-4.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125m1.125-1.125c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M7.506 8.25h11.619m-11.619 0c-.62 0-1.125.504-1.125 1.125M19.125 8.25c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h3.381m1.125-1.125v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125m1.125-1.125c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125m0 1.5v-1.5m0 0c0-.621.504-1.125 1.125-1.125m0 0h11.619"/><path fill="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="0" d="M.737.877H7.042V15.369000000000002H.737z" /></svg>',
+          command: (editor) => {
+            editor.commands.toggleHeaderColumn();
+          },
+        },
+        {
+          title: "Merge or split cells",
+          name: "mergeOrSplit",
+          icon: '<svg fill="none" height="21" width="21" viewBox="0 0 48 48" stroke="currentColor" width="48" stroke-width="1.5" xmlns="http://www.w3.org/2000/svg"><g stroke-linecap="round" stroke-width="4"><path d="m20 14v-9c0-.55228-.4477-1-1-1h-14c-.55228 0-1 .44772-1 1v38c0 .5523.44772 1 1 1h14c.5523 0 1-.4477 1-1v-9"/><path d="m28 34v9c0 .5523.4477 1 1 1h14c.5523 0 1-.4477 1-1v-38c0-.55228-.4477-1-1-1h-14c-.5523 0-1 .44772-1 1v9"/><path d="m28 24h16"/><path d="m5 24h15"/><path d="m32.7485 28.8183-1.591-1.5909-3.1819-3.182 3.1819-3.182 1.591-1.591" stroke-linejoin="round"/><path d="m15.375 28.8183 1.591-1.5909 3.182-3.182-3.182-3.182-1.591-1.591" stroke-linejoin="round"/></g></svg>',
+          command: (editor) => {
+            editor.commands.mergeOrSplit();
+          },
         },
       ],
     },

@@ -1,6 +1,66 @@
 <template>
   <div>
     <bubble-menu
+      v-if="editor && tableRowTools && tableIsActive"
+      :editor="editor"
+      pluginKey="tableRowMenu"
+      :should-show="tableIsActive"
+      :tippy-options="{
+        placement: 'left',
+        getReferenceClientRect: getTableRowMenuCoords,
+      }"
+    >
+      <menu-item>
+        <menu-button
+          title="Row tools"
+          icon-name="ellipsis-horizontal-circle"
+          class="rounded-full"
+        ></menu-button>
+        <template #dropdown>
+          <menu-dropdown-button
+            v-for="tool in tableRowTools"
+            :iconSvg="tool.icon"
+            :key="tool.title"
+            :label="tool.title"
+            @click="tool.command(editor)"
+          >
+            {{ tool.title }}
+          </menu-dropdown-button>
+        </template>
+      </menu-item>
+    </bubble-menu>
+
+    <bubble-menu
+      v-if="editor && tableColumnTools && tableIsActive"
+      :editor="editor"
+      pluginKey="tableColumnMenu"
+      :should-show="tableIsActive"
+      :tippy-options="{
+        placement: 'bottom',
+        getReferenceClientRect: getTableColumnMenuCoords,
+      }"
+    >
+      <menu-item>
+        <menu-button
+          title="Column tools"
+          icon-name="ellipsis-horizontal-circle"
+          class="rounded-full"
+        ></menu-button>
+        <template #dropdown>
+          <menu-dropdown-button
+            v-for="tool in tableColumnTools"
+            :iconSvg="tool.icon"
+            :key="tool.title"
+            :label="tool.title"
+            @click="tool.command(editor)"
+          >
+            {{ tool.title }}
+          </menu-dropdown-button>
+        </template>
+      </menu-item>
+    </bubble-menu>
+    <bubble-menu
+      pluginKey="mainMenu"
       @dragend="endDragging($event)"
       :draggable="dragging"
       :should-show="editorIsActive"
@@ -10,233 +70,184 @@
       :tippy-options="{
         maxWidth: 'none',
         placement: 'top-start',
-        duration: 100,
-        getReferenceClientRect: getTippyCoords,
+        getReferenceClientRect: getMenuCoords,
       }"
     >
       <div class="flex flex-row">
         <button
-          class="p-2 h-12 hover:bg-slate-50 rounded"
-          :class="{ 'cursor-grab': !dragging, 'cursor-grabbing': dragging }"
+          class="ml-1 my-2 w-6 h-8 hover:bg-slate-100 rounded"
+          :class="{
+            'cursor-grab': !dragging,
+            'cursor-grabbing mr-1': dragging,
+          }"
           aria-label="Drag"
+          data-tooltip="Drag"
           @mousedown="startDragging($event)"
           @mouseup="
             draggedNodePosition = false;
             dragging = false;
           "
         >
-          <svg
-            width="24"
-            height="24"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-            focusable="false"
-          >
-            <path
-              d="M8 7h2V5H8v2zm0 6h2v-2H8v2zm0 6h2v-2H8v2zm6-14v2h2V5h-2zm0 8h2v-2h-2v2zm0 6h2v-2h-2v2z"
-            ></path>
-          </svg>
+          <svg-icon class="w-6 h-8" name="drag" />
         </button>
 
-        <div class="p-2 -ml-2 group relative" v-if="!dragging">
-          <button
-            class="hover:bg-slate-50 rounded p-1 group-focus-within:bg-slate-600 group-focus-within:text-white"
-            aria-label="Convert"
-          >
-            <span
-              v-html="
-                blockTools.find((tool) => tool.name == getTopLevelNodeType())
-                  ?.icon
+        <div class="py-2 group relative" v-if="!dragging && currentBlockTool">
+          <menu-item>
+            <menu-button
+              :title="currentBlockTool?.name"
+              :icon-svg="currentBlockTool?.icon"
+              :class="
+                currentBlockTool?.canBeConverted &&
+                'group-focus-within:bg-slate-600 !cursor-pointer group-focus-within:text-white hover:bg-slate-50'
               "
-            ></span>
-          </button>
-          <div
-            class="bg-white shadow group-focus-within:block hidden whitespace-nowrap absolute -mt-px top-[calc(100%+0.5rem)] rounded left-0 border border-slate-400"
-          >
-            <div class="p-3 uppercase text-gray-600 text-xs pb-1 tracking-wide">
-              Transform to
-            </div>
-            <button
-              class="w-full flex p-2 pr-12 flex-row items-center gap-2 hover:bg-slate-50"
-              :key="tool.title"
-              :aria-label="`${tool.title}`"
-              v-for="tool in blockTools.filter((tool) => tool.convertCommand)"
-              @click="tool.convertCommand(editor)"
-              :class="{ hidden: tool.isActiveTest(editor) }"
-            >
-              <span v-html="tool.icon"></span> {{ tool.title }}
-            </button>
-          </div>
+            ></menu-button>
+            <template #dropdown>
+              <div
+                class="p-3 uppercase text-gray-600 text-xs pb-1 tracking-wide"
+              >
+                Transform to
+              </div>
+              <menu-dropdown-button
+                v-for="tool in blockTools.filter((tool) => tool.convertCommand)"
+                :iconSvg="tool.icon"
+                :key="tool.title"
+                :label="tool.title"
+                @click="tool.convertCommand(editor)"
+                activeClass="hidden"
+                :active="tool.isActiveTest(editor)"
+              >
+                {{ tool.title }}
+              </menu-dropdown-button>
+            </template>
+          </menu-item>
         </div>
 
         <div class="pr-2 flex flex-col" v-if="!dragging">
           <button
             @click="moveNode('UP')"
             :disabled="!canMoveNodeUp()"
+            data-tooltip="Move up"
             class="mt-2"
           >
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="currentColor"
-              aria-hidden="true"
-              focusable="false"
-            >
-              <path
-                d="M6.5 12.4L12 8l5.5 4.4-.9 1.2L12 10l-4.5 3.6-1-1.2z"
-              ></path>
-            </svg>
+            <svg-icon name="chevron-up" />
           </button>
           <button
             @click="moveNode('DOWN')"
             :disabled="!canMoveNodeDown()"
+            data-tooltip="Move down"
             class="-mt-3.5"
           >
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="currentColor"
-              aria-hidden="true"
-              focusable="false"
-            >
-              <path
-                d="M17.5 11.6L12 16l-5.5-4.4.9-1.2L12 14l4.5-3.6 1 1.2z"
-              ></path>
-            </svg>
+            <svg-icon name="chevron-down" />
           </button>
-        </div>
-      </div>
-
-      <div class="flex flex-row p-2 gap-1" v-if="!dragging">
-        <div
-          v-for="(alignmentToolGroup, key) in alignmentTools"
-          :key="key"
-          class="group relative"
-        >
-          <!--
-            Note we’re for-ing here even though only one button is displayed... we check if the current block has a blockWidth to decide whether to show the dropdown trigger -->
-          <button
-            class="hover:bg-slate-50 p-1 rounded group-focus-within:bg-slate-600 group-focus-within:text-white"
-            :key="tool.title"
-            aria-label="Change block width"
-            v-for="tool in alignmentToolGroup.filter((tool) =>
-              tool.isActiveTest(editor)
-            )"
-          >
-            <span v-html="tool.icon"></span>
-          </button>
-          <div
-            class="bg-white shadow group-focus-within:block hidden absolute top-[calc(100%+0.5rem)] rounded overflow-hidden -left-px border border-slate-400"
-          >
-            <button
-              class="w-full flex p-2 pr-6 flex-row items-center gap-2 hover:bg-slate-50 whitespace-nowrap"
-              :key="tool.title"
-              :aria-label="`Toggle ${tool.title}`"
-              v-for="tool in alignmentToolGroup"
-              @click="tool.command(editor)"
-              :class="{ '!bg-slate-100': tool.isActiveTest(editor) }"
-            >
-              <span v-html="tool.icon"></span> {{ tool.title }}
-            </button>
-          </div>
         </div>
       </div>
 
       <div
-        v-if="
-          !dragging &&
-          blockTools.find((tool) => tool.name == getTopLevelNodeType())?.tools
-            ?.length
-        "
+        class="flex gap-1 items-center hide-empty flex-row p-2"
+        v-if="!dragging"
+      >
+        <menu-item
+          v-for="(alignmentToolGroup, key) in activeAlignmentTools"
+          :key="key"
+        >
+          <menu-button
+            :title="
+              alignmentToolGroup.find((tool) => tool.isActiveTest(editor))
+                ?.title
+            "
+            :icon-svg="
+              alignmentToolGroup.find((tool) => tool.isActiveTest(editor))?.icon
+            "
+          ></menu-button>
+          <template #dropdown>
+            <menu-dropdown-button
+              v-for="tool in alignmentToolGroup"
+              :key="tool.title"
+              :iconSvg="tool.icon"
+              :label="tool.title"
+              @click="tool.command(editor)"
+              :active="tool.isActiveTest(editor)"
+              >{{ tool.title }}</menu-dropdown-button
+            >
+          </template>
+        </menu-item>
+      </div>
+
+      <div
+        v-if="!dragging && currentBlockTool?.tools?.length"
         class="gap-1 flex flex-row items-center p-2"
       >
-        <button
-          class="p-1 hover:bg-slate-50"
-          :title="tool.title"
-          :disabled="tool.isDisabledTest?.call(0, editor)"
-          :class="{
-            [tool.isActiveClass ??
-            'bg-slate-600 hover:bg-slate-700 text-white rounded']: tool.isActiveTest?.call(
-              0,
-              editor
-            ),
-          }"
-          @click="tool.command(editor)"
+        <menu-button
+          v-for="tool in currentBlockTool?.tools"
           :key="tool.name"
-          v-for="tool in blockTools.find(
-            (tool) => tool.name == getTopLevelNodeType()
-          )?.tools"
-        >
-          <span v-html="tool.icon"></span>
-        </button>
+          :iconSvg="tool.icon"
+          :label="tool.title"
+          :activeClass="tool.isActiveClass"
+          @click="tool.command.call(0, editor)"
+          :disabled="tool.isDisabledTest?.call(0, editor)"
+          :active="tool.isActiveTest?.call(0, editor)"
+        ></menu-button>
       </div>
 
-      <div class="p-2 gap-1 flex flex-row items-center" v-if="!dragging">
-        <button
-          :key="tool.title"
-          :aria-label="`Toggle ${tool.title}`"
-          v-for="tool in inlineTools"
-          class="hover:bg-slate-50 p-1 block"
-          @click="tool.command(editor)"
-          :class="{
-            [tool.isActiveClass ??
-            'bg-slate-600 hover:bg-slate-700 text-white rounded']:
-              tool.isActiveTest(editor),
-          }"
-        >
-          <span v-html="tool.icon"></span>
-        </button>
+      <div
+        v-if="currentBlockTool?.hasInlineTools && !dragging"
+        class="p-2 gap-1 flex relative flex-row items-center"
+      >
+        <menu-item align="right" :key="tool.title" v-for="tool in inlineTools">
+          <menu-button
+            :iconSvg="tool.icon"
+            :label="tool.title"
+            :activeClass="tool.isActiveClass"
+            @click="tool.command(editor)"
+            :active="tool.isActiveTest(editor)"
+          ></menu-button>
+          <template #dropdown>
+            <menu-dropdown-button
+              v-for="tool in tool.tools"
+              :key="tool.name"
+              :iconSvg="tool.icon"
+              @click="tool.command(editor)"
+              :active="tool.isActiveTest(editor)"
+              >{{ tool.title }}</menu-dropdown-button
+            >
+          </template>
+        </menu-item>
       </div>
       <div
-        v-if="
-          editor && editor.can().deleteNode(getTopLevelNodeType()) && !dragging
-        "
-        class="p-2 gap-1 flex flex-row items-center"
+        v-if="editor && editor.can().deleteNode(topLevelNodeType) && !dragging"
+        class="p-2 gap-1 flex group flex-row items-center relative"
       >
-        <button
-          class="hover:bg-slate-50 p-1 flex-row gap-2 flex capitalize items-center"
-          aria-label="Delete block"
-          title="Delete block"
-          @click="editor.commands.deleteNode(getTopLevelNodeType())"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="w-6 h-6"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
-            />
-          </svg>
-          {{ getTopLevelNodeType() }}
-        </button>
+        <menu-item align="right">
+          <menu-button iconName="more" label="More"></menu-button>
+          <template #dropdown>
+            <menu-dropdown-button
+              iconName="delete"
+              label="Delete block"
+              @click="editor.commands.deleteNode(topLevelNodeType)"
+              >Delete {{ topLevelNodeType }}</menu-dropdown-button
+            >
+          </template>
+        </menu-item>
       </div>
     </bubble-menu>
 
-    <editor-content ref="editor" :editor="editor" />
-
-    <div
-      v-if="editor"
-      class="text-base px-8 fixed bottom-0 bg-gray-100 py-1 border-t left-0 right-0 flex flex-row gap-2"
-    >
-      <div v-for="(node, key) in nodeTree" :key="node">
-        {{ node }} <span v-if="key < nodeTree.length - 1">&gt;</span>
-      </div>
+    <div>
+      <editor-content
+        @click="updateToolbar"
+        @keyup="updateToolbar"
+        ref="editor"
+        :editor="editor"
+      />
     </div>
   </div>
 </template>
 
 <script>
+import SvgIcon from "./SvgIcon";
+import MenuButton from "./MenuButton";
+import MenuItem from "./MenuItem";
+import MenuDropdownButton from "./MenuDropdownButton";
+
 import { BubbleMenu, Editor, EditorContent } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
@@ -247,20 +258,29 @@ import TableHeader from "@tiptap/extension-table-header";
 import TableRow from "@tiptap/extension-table-row";
 import TextAlign from "@tiptap/extension-text-align";
 import Blockquote from "@tiptap/extension-blockquote";
+import Subscript from "@tiptap/extension-subscript";
+import Superscript from "@tiptap/extension-superscript";
+import Highlight from "@tiptap/extension-highlight";
+
 import {
   DragNode,
   MoveNode,
   GetTopLevelBlockCoords,
+  GetTableColumnCoords,
+  GetTableRowCoords,
   GetTopLevelNode,
-  GetNodeTree,
 } from "../utils/pm-utils.js";
 import BlockWidth from "../extensions/block-width";
 import VueComponent from "../extensions/vue-component";
+import { TrailingNode } from "../extensions/trailing-node";
 
 import Commands from "./commands";
 import suggestion from "./suggestion";
 
+// import NodeTree from "./NodeTree";
+
 import inlineTools from "../tools/inline-tools";
+import { tableRowTools, tableColumnTools } from "../tools/table-tools";
 import blockTools from "../tools/block-tools";
 import alignmentTools from "../tools/alignment-tools";
 
@@ -270,6 +290,10 @@ export default {
   components: {
     BubbleMenu,
     EditorContent,
+    SvgIcon,
+    MenuButton,
+    MenuItem,
+    MenuDropdownButton,
   },
 
   data() {
@@ -281,6 +305,10 @@ export default {
       blockTools: blockTools(),
       inlineTools: inlineTools(),
       alignmentTools: alignmentTools(),
+      tableRowTools: tableRowTools(),
+      tableColumnTools: tableColumnTools(),
+      topLevelNodeType: null,
+      currentBlockTool: null,
     };
   },
 
@@ -291,9 +319,13 @@ export default {
           blockquote: false,
         }),
         Blockquote.extend({
-          content: "paragraph*",
+          content: "paragraph",
         }),
         VueComponent,
+        TrailingNode,
+        Subscript,
+        Superscript,
+        Highlight,
         Commands.configure({
           suggestion,
         }),
@@ -325,7 +357,6 @@ export default {
       ],
       onUpdate: () => {
         this.$emit("update:modelValue", this.editor.getJSON().content);
-        this.nodeTree = GetNodeTree(this.editor.view);
       },
     });
     this.editor.content = this.modelValue;
@@ -335,9 +366,43 @@ export default {
     this.editor.destroy();
   },
 
+  watch: {
+    topLevelNodeType() {
+      this.currentBlockTool = this.getCurrentBlockTool();
+    },
+  },
+
+  computed: {
+    activeAlignmentTools() {
+      return this.alignmentTools.filter((alignmentToolGroup) =>
+        alignmentToolGroup.find((tool) => tool.isActiveTest(this.editor))
+      );
+    },
+  },
+
   methods: {
-    getTippyCoords() {
+    updateToolbar() {
+      this.topLevelNodeType = this.getTopLevelNodeType();
+    },
+
+    getCurrentBlockTool() {
+      return this.blockTools.find(
+        (tool) =>
+          tool.name == this.topLevelNodeType ||
+          tool.tools?.find((tool) => tool.name == this.topLevelNodeType)
+      );
+    },
+
+    getMenuCoords() {
       return GetTopLevelBlockCoords(this.editor.view);
+    },
+
+    getTableRowMenuCoords() {
+      return GetTableRowCoords(this.editor.view);
+    },
+
+    getTableColumnMenuCoords() {
+      return GetTableColumnCoords(this.editor.view);
     },
 
     startDragging(event) {
@@ -367,6 +432,10 @@ export default {
 
     editorIsActive() {
       return this.editor.isActive();
+    },
+
+    tableIsActive() {
+      return this.currentBlockTool?.name == "table";
     },
 
     moveNode(dir = "UP") {
@@ -404,15 +473,15 @@ export default {
 }
 
 .ProseMirror > * {
-  @apply max-w-3xl mx-auto;
+  @apply max-w-2xl mx-auto;
 }
 
 .ProseMirror-gapcursor {
-  @apply !mx-auto block;
+  @apply mx-auto mt-6 block relative !important;
 }
 
 .ProseMirror-gapcursor:after {
-  @apply block;
+  @apply block relative border-t-0 border-l h-6 border-black !important;
 }
 
 .ProseMirror table {
@@ -436,6 +505,10 @@ export default {
   @apply bg-slate-50;
 }
 
+blockquote .ProseMirror-trailingBreak {
+  display: none;
+}
+
 .ProseMirror p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
   float: left;
@@ -446,19 +519,29 @@ export default {
 
 hr {
   height: auto;
-  border-top-width: 4px !important;
-  border-radius: 10px !important;
-}
-
-hr:before {
-  content: "♪♪";
-}
-
-hr:after {
-  content: " This is an <hr> element";
+  border-top-width: 6px !important;
+  border-radius: 4px !important;
+  margin: 1.5rem 0;
 }
 
 .ProseMirror-selectednode {
   outline: 2px solid lightblue;
+}
+
+button:empty {
+  display: none;
+}
+
+[data-tooltip] {
+  position: relative;
+}
+
+[data-tooltip]:hover::after {
+  @apply translate-y-0 opacity-100;
+}
+
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  @apply whitespace-nowrap transition text-xs px-1.5 py-0.5 text-white bg-black rounded-sm absolute top-[calc(100%+1rem)] left-1/2 -translate-x-1/2 translate-y-1 opacity-0  pointer-events-none;
 }
 </style>

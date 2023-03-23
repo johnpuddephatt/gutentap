@@ -69,9 +69,7 @@ export default {
   //     },
   //   },
 
-  mounted() {
-    console.log(this.node.value);
-  },
+  mounted() {},
 
   methods: {
     increase() {
