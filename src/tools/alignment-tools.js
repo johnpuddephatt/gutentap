@@ -34,7 +34,8 @@ export default function () {
         command: (editor) => {
           editor.chain().focus().setBlockWidth("normal").run();
         },
-        isActiveTest: (editor) => editor.isActive({ blockWidth: "normal" }),
+        isActiveTest: (editor, topLevelNodeType) =>
+          editor.isActive(topLevelNodeType, { blockWidth: "normal" }),
       },
       {
         title: "Wide width",
@@ -42,7 +43,8 @@ export default function () {
         command: (editor) => {
           editor.chain().focus().setBlockWidth("wide").run();
         },
-        isActiveTest: (editor) => editor.isActive({ blockWidth: "wide" }),
+        isActiveTest: (editor, topLevelNodeType) =>
+          editor.isActive(topLevelNodeType, { blockWidth: "wide" }),
       },
       {
         title: "Full width",
@@ -50,7 +52,8 @@ export default function () {
         command: (editor) => {
           editor.chain().focus().setBlockWidth("full").run();
         },
-        isActiveTest: (editor) => editor.isActive({ blockWidth: "full" }),
+        isActiveTest: (editor, topLevelNodeType) =>
+          editor.isActive(topLevelNodeType, { blockWidth: "full" }),
       },
     ],
   ];

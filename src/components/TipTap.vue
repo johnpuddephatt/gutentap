@@ -1,7 +1,7 @@
 <template>
   <div>
     <bubble-menu
-      v-if="editor && tableRowTools && tableIsActive"
+      v-if="editor && tableRowTools"
       :editor="editor"
       pluginKey="tableRowMenu"
       :should-show="tableIsActive"
@@ -31,7 +31,7 @@
     </bubble-menu>
 
     <bubble-menu
-      v-if="editor && tableColumnTools && tableIsActive"
+      v-if="editor && tableColumnTools"
       :editor="editor"
       pluginKey="tableColumnMenu"
       :should-show="tableIsActive"
@@ -59,14 +59,18 @@
         </template>
       </menu-item>
     </bubble-menu>
+
     <bubble-menu
       pluginKey="mainMenu"
       @dragend="endDragging($event)"
       :draggable="dragging"
-      :should-show="editorIsActive"
+      :should-show="shouldShowMainToolbar"
+      v-if="editor"
       class="text-sm bg-white flex divide-x divide-slate-400 flex-row border-slate-400 rounded border"
       :editor="editor"
-      v-if="editor"
+      :class="{
+        'pointer-events-none opacity-0': isTyping,
+      }"
       :tippy-options="{
         maxWidth: 'none',
         placement: 'top-start',
@@ -166,7 +170,7 @@
               :iconSvg="tool.icon"
               :label="tool.title"
               @click="tool.command(editor)"
-              :active="tool.isActiveTest(editor)"
+              :active="tool.isActiveTest(editor, topLevelNodeType)"
               >{{ tool.title }}</menu-dropdown-button
             >
           </template>
@@ -233,8 +237,7 @@
 
     <div>
       <editor-content
-        @click="updateToolbar"
-        @keyup="updateToolbar"
+        @keydown="isTyping = true"
         ref="editor"
         :editor="editor"
       />
@@ -309,7 +312,17 @@ export default {
       tableColumnTools: tableColumnTools(),
       topLevelNodeType: null,
       currentBlockTool: null,
+      isTyping: false,
+      showMainToolbar: false,
     };
+  },
+
+  created: function () {
+    window.addEventListener("mousemove", () => this.cancelTyping());
+  },
+
+  unmounted: function () {
+    window.removeEventListener("mousemove", () => this.cancelTyping());
   },
 
   mounted() {
@@ -333,7 +346,7 @@ export default {
           openOnClick: false,
         }),
         Placeholder.configure({
-          placeholder: "Write something…",
+          placeholder: "Type / to choose a block",
         }),
         BlockWidth.configure({
           types: ["paragraph", "horizontalRule", "blockquote"],
@@ -358,8 +371,16 @@ export default {
       onUpdate: () => {
         this.$emit("update:modelValue", this.editor.getJSON().content);
       },
+
+      onSelectionUpdate: () => {
+        this.updateToolbar();
+      },
     });
-    this.editor.content = this.modelValue;
+
+    this.editor.commands.setContent({
+      type: "doc",
+      content: this.modelValue,
+    });
   },
 
   beforeUnmount() {
@@ -381,6 +402,14 @@ export default {
   },
 
   methods: {
+    cancelTyping() {
+      this.$nextTick(() => (this.isTyping = false));
+    },
+
+    shouldShowMainToolbar() {
+      return this.editor.isActive();
+    },
+
     updateToolbar() {
       this.topLevelNodeType = this.getTopLevelNodeType();
     },
@@ -430,12 +459,8 @@ export default {
       this.draggedNode = null;
     },
 
-    editorIsActive() {
-      return this.editor.isActive();
-    },
-
     tableIsActive() {
-      return this.currentBlockTool?.name == "table";
+      return this.getTopLevelNodeType() == "table";
     },
 
     moveNode(dir = "UP") {
@@ -543,5 +568,13 @@ button:empty {
 [data-tooltip]::after {
   content: attr(data-tooltip);
   @apply whitespace-nowrap transition text-xs px-1.5 py-0.5 text-white bg-black rounded-sm absolute top-[calc(100%+1rem)] left-1/2 -translate-x-1/2 translate-y-1 opacity-0  pointer-events-none;
+}
+
+.ProseMirror p.is-empty::before {
+  color: #adb5bd;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
 }
 </style>
