@@ -7,7 +7,7 @@
 }
 
 .ProseMirror > * {
-  @apply max-w-2xl mx-auto;
+  @apply max-w-lg md:max-w-xl lg:max-w-2xl mx-auto px-4;
 }
 
 [data-block-width="wide"] {
