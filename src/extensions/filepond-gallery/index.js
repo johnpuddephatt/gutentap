@@ -8,7 +8,7 @@ export default Node.create({
 
   group: "block",
 
-  atom: false,
+  // atom: false,
 
   content: "inline*",
 

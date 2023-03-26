@@ -1,76 +1,26 @@
 <template>
-  <node-view-wrapper
-    contenteditable="false"
-    class="relative border-2 border-slate-400 rounded my-16 p-6"
-  >
-    <span class="label">Vue Component</span>
+  <node-view-wrapper class="vue-component">
+    <span class="label" contenteditable="false">Vue Component</span>
 
-    <div class="content">
-      <button
-        class="border-2 border-slate-400 rounded px-2 mt-2"
-        contenteditable="false"
-        @click="increase"
-      >
-        {{ node.attrs.count }} times
+    <div contenteditable="false" class="content">
+      <button @click="increase">
+        This button has been clicked {{ node.attrs.count }} times.
       </button>
     </div>
+    <node-view-content class="content" />
   </node-view-wrapper>
 </template>
 
 <script>
-import { nodeViewProps, NodeViewWrapper } from "@tiptap/vue-3";
+import { NodeViewContent, nodeViewProps, NodeViewWrapper } from "@tiptap/vue-3";
 
 export default {
   components: {
     NodeViewWrapper,
-    // NodeViewContent,
+    NodeViewContent,
   },
 
   props: nodeViewProps,
-
-  //   props: {
-  //     // the editor instance
-  //     editor: {
-  //       type: Object,
-  //     },
-
-  //     // the current node
-  //     node: {
-  //       type: Object,
-  //     },
-
-  //     // an array of decorations
-  //     decorations: {
-  //       type: Array,
-  //     },
-
-  //     // `true` when there is a `NodeSelection` at the current node view
-  //     selected: {
-  //       type: Boolean,
-  //     },
-
-  //     // access to the node extension, for example to get options
-  //     extension: {
-  //       type: Object,
-  //     },
-
-  //     // get the document position of the current node
-  //     getPos: {
-  //       type: Function,
-  //     },
-
-  //     // update attributes of the current node
-  //     updateAttributes: {
-  //       type: Function,
-  //     },
-
-  //     // delete the current node
-  //     deleteNode: {
-  //       type: Function,
-  //     },
-  //   },
-
-  mounted() {},
 
   methods: {
     increase() {
@@ -83,6 +33,14 @@ export default {
 </script>
 
 <style>
+.vue-component {
+  background: #faf594;
+  border: 3px solid #0d0d0d;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+  position: relative;
+}
+
 .label {
   margin-left: 1rem;
   background-color: #0d0d0d;
@@ -100,5 +58,12 @@ export default {
 .content {
   margin-top: 1.5rem;
   padding: 1rem;
+}
+
+.vue-component button {
+  display: inline-block;
+  border: 3px solid black;
+  border-radius: 5px;
+  padding: 0.25rem 1rem;
 }
 </style>

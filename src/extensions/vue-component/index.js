@@ -8,9 +8,9 @@ export default Node.create({
 
   group: "block",
 
-  atom: false,
-
   content: "inline*",
+
+  // atom: true,
 
   addAttributes() {
     return {
