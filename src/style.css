@@ -6,6 +6,10 @@
   @apply text-gray-300 cursor-default;
 }
 
+.ProseMirror > * {
+  @apply max-w-2xl mx-auto;
+}
+
 [data-block-width="wide"] {
   @apply max-w-4xl;
 }
@@ -14,11 +18,104 @@
   @apply max-w-none;
 }
 
-.resize-cursor {
-  cursor: col-resize;
+.hide-empty:empty {
+  display: none;
 }
 
-.ProseMirror table .column-resize-handle {
+.ProseMirror:focus-visible {
+  outline: none;
+}
+
+.ProseMirror > *:first-child {
+  margin-top: 0;
+}
+
+.ProseMirror-gapcursor {
+  @apply mx-auto mt-6 block relative !important;
+}
+
+.ProseMirror-gapcursor:after {
+  @apply block relative border-t-0 border-l h-6 border-black !important;
+}
+
+.ProseMirror table p {
+  @apply my-0;
+}
+
+.ProseMirror table p + p {
+  @apply mt-2;
+}
+
+blockquote .ProseMirror-trailingBreak {
+  display: none;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #adb5bd;
+  pointer-events: none;
+  height: 0;
+}
+
+.ProseMirror-selectednode {
+  outline: 2px solid lightblue;
+}
+
+.ProseMirror p.is-empty::before {
+  color: #adb5bd;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.ProseMirror table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+.ProseMirror td,
+.ProseMirror th {
+  min-width: 1em;
+  border: 2px solid #ced4da;
+  padding: 3px 5px;
+  vertical-align: top;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.ProseMirror td > *,
+.ProseMirror th > * {
+  margin-bottom: 0;
+}
+
+.ProseMirror th {
+  font-weight: bold;
+  text-align: left;
+  @apply bg-slate-50;
+}
+
+.ProseMirror .selectedCell:after {
+  z-index: 2;
+  position: absolute;
+  content: "";
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: rgba(200, 200, 255, 0.4);
+  pointer-events: none;
+}
+
+.ProseMirror table p {
+  margin: 0;
+}
+
+.column-resize-handle {
   position: absolute;
   right: -2px;
   top: 0;
@@ -28,16 +125,11 @@
   pointer-events: none;
 }
 
-.ProseMirror table td,
-.ProseMirror table th {
-  min-width: 1em;
-  border: 2px solid #ced4da;
-  padding: 3px 5px;
-  vertical-align: top;
-  box-sizing: border-box;
-  position: relative;
+.tableWrapper {
+  overflow-x: auto;
 }
 
-.hide-empty:empty {
-  display: none;
+.resize-cursor {
+  cursor: ew-resize;
+  cursor: col-resize;
 }

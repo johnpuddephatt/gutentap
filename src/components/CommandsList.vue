@@ -4,7 +4,7 @@
       <button
         class="flex flex-row gap-2 items-center w-full p-2 pr-12 text-slate-600 hover:bg-slate-50 text-sm"
         :class="{ 'bg-slate-100': index === selectedIndex }"
-        v-for="(item, index) in items"
+        v-for="(item, index) in itemsWithInsertCommand"
         :key="index"
         @click="selectItem(index)"
       >
@@ -39,6 +39,12 @@ export default {
   watch: {
     items() {
       this.selectedIndex = 0;
+    },
+  },
+
+  computed: {
+    itemsWithInsertCommand() {
+      return this.items.filter((item) => item.insertCommand);
     },
   },
 

@@ -1,24 +1,6 @@
 export default function () {
   return [
     {
-      name: "vueComponent",
-      title: "Vue component",
-      icon: '<svg  width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 32 32"><path d="M24.3,4h-4.8L16,9.6L13,4H2l14,24L30,4L24.3,4z M5.5,6h3.4L16,18.4L23.1,6h3.4L16,24L5.5,6z"/></svg>',
-      insertCommand: ({ editor, range }) => {
-        editor
-          .chain()
-          .focus()
-          .deleteRange(range)
-          .insertContent('<div><vue-component count="0"></vue-component></div>')
-          .run();
-      },
-      //   convertCommand: (editor) => {
-      //     editor.chain().focus().setParagraph().run();
-      //   },
-      hasInlineTools: false,
-      isActiveTest: (editor) => editor.isActive("vueComponent"),
-    },
-    {
       name: "paragraph",
       title: "Paragraph",
       icon: '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor" focusable="false"><path d="M18.3 4H9.9v-.1l-.9.2c-2.3.4-4 2.4-4 4.8s1.7 4.4 4 4.8l.7.1V20h1.5V5.5h2.9V20h1.5V5.5h2.7V4z"></path></svg>',
@@ -211,6 +193,46 @@ export default function () {
           },
         },
       ],
+    },
+
+    {
+      name: "vueComponent",
+      title: "Sample Vue component",
+      icon: '<svg  width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 32 32"><path d="M24.3,4h-4.8L16,9.6L13,4H2l14,24L30,4L24.3,4z M5.5,6h3.4L16,18.4L23.1,6h3.4L16,24L5.5,6z"/></svg>',
+      insertCommand: ({ editor, range }) => {
+        editor
+          .chain()
+          .focus()
+          .deleteRange(range)
+          .insertContent('<div><vue-component count="0"></vue-component></div>')
+          .run();
+      },
+      //   convertCommand: (editor) => {
+      //     editor.chain().focus().setParagraph().run();
+      //   },
+      hasInlineTools: false,
+      isActiveTest: (editor) => editor.isActive("vueComponent"),
+    },
+    {
+      name: "filepondGallery",
+      title: "Gallery",
+      icon: '<svg  width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 32 32"><path d="M24.3,4h-4.8L16,9.6L13,4H2l14,24L30,4L24.3,4z M5.5,6h3.4L16,18.4L23.1,6h3.4L16,24L5.5,6z"/></svg>',
+      insertCommand: ({ editor, range }) => {
+        editor
+          .chain()
+          .focus()
+          .deleteRange(range)
+          .insertContent("<div><filepond-gallery></filepond-gallery></div>")
+          .run();
+      },
+    },
+    {
+      title: "YouTube",
+      name: "youtube",
+      icon: '<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="24" height="24" version="1.1" viewBox="0 0 461.001 461.001"><path fill="currentColor" d="M365.257 67.393H95.744C42.866 67.393 0 110.259 0 163.137v134.728c0 52.878 42.866 95.744 95.744 95.744h269.513c52.878 0 95.744-42.866 95.744-95.744V163.137c0-52.878-42.866-95.744-95.744-95.744zm-64.751 169.663-126.06 60.123c-3.359 1.602-7.239-.847-7.239-4.568V168.607c0-3.774 3.982-6.22 7.348-4.514l126.06 63.881c3.748 1.899 3.683 7.274-.109 9.082z"/></svg>',
+      hasInlineTools: false,
+      canBeConverted: false,
+      isActiveTest: (editor) => editor.isActive("youtube"),
     },
   ];
 }

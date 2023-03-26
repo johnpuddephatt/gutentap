@@ -14,7 +14,7 @@
         <menu-button
           title="Row tools"
           icon-name="ellipsis-horizontal-circle"
-          class="rounded-full"
+          class="rounded-full text-slate-400 hover:text-slate-800"
         ></menu-button>
         <template #dropdown>
           <menu-dropdown-button
@@ -44,7 +44,7 @@
         <menu-button
           title="Column tools"
           icon-name="ellipsis-horizontal-circle"
-          class="rounded-full"
+          class="rounded-full text-slate-400 hover:text-slate-800"
         ></menu-button>
         <template #dropdown>
           <menu-dropdown-button
@@ -105,7 +105,7 @@
                 'group-focus-within:bg-slate-600 !cursor-pointer group-focus-within:text-white hover:bg-slate-50'
               "
             ></menu-button>
-            <template #dropdown>
+            <template v-if="currentBlockTool?.canBeConverted" #dropdown>
               <div
                 class="p-3 uppercase text-gray-600 text-xs pb-1 tracking-wide"
               >
@@ -217,6 +217,7 @@
           </template>
         </menu-item>
       </div>
+
       <div
         v-if="editor && editor.can().deleteNode(topLevelNodeType) && !dragging"
         class="p-2 gap-1 flex group flex-row items-center relative"
@@ -225,10 +226,11 @@
           <menu-button iconName="more" label="More"></menu-button>
           <template #dropdown>
             <menu-dropdown-button
+              ref="deleteButton"
               iconName="delete"
               label="Delete block"
-              @click="editor.commands.deleteNode(topLevelNodeType)"
-              >Delete {{ topLevelNodeType }}</menu-dropdown-button
+              @click="deleteNode(topLevelNodeType)"
+              >Delete</menu-dropdown-button
             >
           </template>
         </menu-item>
@@ -238,9 +240,18 @@
     <div>
       <editor-content
         @keydown="isTyping = true"
+        @keyup.esc="isTyping = false"
         ref="editor"
         :editor="editor"
       />
+    </div>
+    <div
+      v-if="editor"
+      class="text-base px-8 fixed bottom-0 bg-gray-100 py-1 border-t left-0 right-0 flex flex-row gap-2"
+    >
+      <div v-for="(node, key) in nodeTree" :key="node">
+        {{ node }} <span v-if="key < nodeTree.length - 1">&gt;</span>
+      </div>
     </div>
   </div>
 </template>
@@ -264,6 +275,7 @@ import Blockquote from "@tiptap/extension-blockquote";
 import Subscript from "@tiptap/extension-subscript";
 import Superscript from "@tiptap/extension-superscript";
 import Highlight from "@tiptap/extension-highlight";
+// import Youtube from "@tiptap/extension-youtube/src/index.ts";
 
 import {
   DragNode,
@@ -272,16 +284,18 @@ import {
   GetTableColumnCoords,
   GetTableRowCoords,
   GetTopLevelNode,
+  GetNodeTree,
 } from "../utils/pm-utils.js";
 
 import BlockWidth from "../extensions/block-width";
 import VueComponent from "../extensions/vue-component";
+import FilepondGallery from "../extensions/filepond-gallery";
+import { Figure } from "../extensions/figure";
+import { Youtube } from "../extensions/youtube";
 import { TrailingNode } from "../extensions/trailing-node";
 
 import Commands from "./commands";
 import suggestion from "./suggestion";
-
-// import NodeTree from "./NodeTree";
 
 import inlineTools from "../tools/inline-tools";
 import { tableRowTools, tableColumnTools } from "../tools/table-tools";
@@ -336,10 +350,12 @@ export default {
           content: "paragraph",
         }),
         VueComponent,
+        FilepondGallery,
         TrailingNode,
         Subscript,
         Superscript,
         Highlight,
+        Figure,
         Commands.configure({
           suggestion,
         }),
@@ -350,7 +366,7 @@ export default {
           placeholder: "Type / to choose a block",
         }),
         BlockWidth.configure({
-          types: ["paragraph", "horizontalRule", "blockquote"],
+          types: ["paragraph", "horizontalRule", "blockquote", "youtube"],
         }),
         TextAlign.configure({
           types: ["heading", "paragraph"],
@@ -369,13 +385,22 @@ export default {
           content: "(inline|hardBreak?)*",
           isolating: false,
         }),
+        Youtube.configure({
+          inline: false,
+          HTMLAttributes: {
+            class: "aspect-video h-auto w-full",
+          },
+        }),
       ],
+
       onUpdate: () => {
+        this.updateToolbar();
         this.$emit("update:modelValue", this.editor.getJSON().content);
       },
 
       onSelectionUpdate: () => {
         this.updateToolbar();
+        this.nodeTree = GetNodeTree(this.editor.view);
       },
     });
 
@@ -422,6 +447,11 @@ export default {
           tool.name == this.topLevelNodeType ||
           tool.tools?.find((tool) => tool.name == this.topLevelNodeType)
       );
+    },
+
+    deleteNode(node) {
+      this.editor.commands.deleteNode(node);
+      this.$refs.deleteButton.$el.blur();
     },
 
     getMenuCoords() {
@@ -491,72 +521,11 @@ export default {
 </script>
 
 <style>
-.ProseMirror:focus-visible {
-  outline: none;
-}
-
-.ProseMirror > *:first-child {
-  margin-top: 0;
-}
-
-.ProseMirror > * {
-  @apply max-w-2xl mx-auto;
-}
-
-.ProseMirror-gapcursor {
-  @apply mx-auto mt-6 block relative !important;
-}
-
-.ProseMirror-gapcursor:after {
-  @apply block relative border-t-0 border-l h-6 border-black !important;
-}
-
-.ProseMirror table {
-  @apply table-fixed;
-}
-
-.ProseMirror table p {
-  @apply my-0;
-}
-
-.ProseMirror table p + p {
-  @apply mt-2;
-}
-
-.ProseMirror td,
-.ProseMirror th {
-  @apply p-2 border border-2;
-}
-
-.ProseMirror th {
-  @apply bg-slate-50;
-}
-
-blockquote .ProseMirror-trailingBreak {
-  display: none;
-}
-
-.ProseMirror p.is-editor-empty:first-child::before {
-  content: attr(data-placeholder);
-  float: left;
-  color: #adb5bd;
-  pointer-events: none;
-  height: 0;
-}
-
 hr {
   height: auto;
   border-top-width: 6px !important;
   border-radius: 4px !important;
   margin: 1.5rem 0;
-}
-
-.ProseMirror-selectednode {
-  outline: 2px solid lightblue;
-}
-
-button:empty {
-  display: none;
 }
 
 [data-tooltip] {
@@ -570,13 +539,5 @@ button:empty {
 [data-tooltip]::after {
   content: attr(data-tooltip);
   @apply whitespace-nowrap transition text-xs px-1.5 py-0.5 text-white bg-black rounded-sm absolute top-[calc(100%+1rem)] left-1/2 -translate-x-1/2 translate-y-1 opacity-0  pointer-events-none;
-}
-
-.ProseMirror p.is-empty::before {
-  color: #adb5bd;
-  content: attr(data-placeholder);
-  float: left;
-  height: 0;
-  pointer-events: none;
 }
 </style>

@@ -25,7 +25,7 @@ export default {
           type: "heading",
           attrs: {
             textAlign: "left",
-            level: 2,
+            level: 1,
           },
           content: [
             {
@@ -70,7 +70,7 @@ export default {
             },
             {
               type: "text",
-              text: ", inspired by ",
+              text: ", inspired by the Wordpress editor, ",
             },
             {
               type: "text",
@@ -96,7 +96,7 @@ export default {
             },
             {
               type: "text",
-              text: " floating toolbar to provide contextual editing options as well as ",
+              text: " floating toolbar as well as ",
             },
             {
               type: "text",
@@ -127,6 +127,142 @@ export default {
           ],
         },
         {
+          type: "heading",
+          attrs: {
+            textAlign: "left",
+            level: 2,
+          },
+          content: [
+            {
+              type: "text",
+              text: "The floating toolbar",
+            },
+          ],
+        },
+        {
+          type: "bulletList",
+          content: [
+            {
+              type: "listItem",
+              content: [
+                {
+                  type: "paragraph",
+                  attrs: {
+                    blockWidth: "normal",
+                    textAlign: "left",
+                  },
+                  content: [
+                    {
+                      type: "text",
+                      text: "disappears when writing to offer an uncluttered experience",
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              type: "listItem",
+              content: [
+                {
+                  type: "paragraph",
+                  attrs: {
+                    blockWidth: "normal",
+                    textAlign: "left",
+                  },
+                  content: [
+                    {
+                      type: "text",
+                      text: "reappears when the cursor is moved or the escape key is pressed",
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              type: "listItem",
+              content: [
+                {
+                  type: "paragraph",
+                  attrs: {
+                    blockWidth: "normal",
+                    textAlign: "left",
+                  },
+                  content: [
+                    {
+                      type: "text",
+                      text: "shows contextual options (e.g. select this list item and you'll see options to change the list type or increase/decrease the indentation)",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          type: "heading",
+          attrs: {
+            textAlign: "left",
+            level: 2,
+          },
+          content: [
+            {
+              type: "text",
+              text: "Configuration",
+            },
+          ],
+        },
+        {
+          type: "paragraph",
+          attrs: {
+            blockWidth: "normal",
+            textAlign: "left",
+          },
+          content: [
+            {
+              type: "text",
+              text: "Most of the configuration is inside the tools folder. The config is organised in a logical fashion:",
+            },
+          ],
+        },
+        {
+          type: "codeBlock",
+          attrs: {
+            language: null,
+          },
+          content: [
+            {
+              type: "text",
+              text: "/ tools\n  - alignment-tools.js    // text alignment and block width\n  - block-tools.js        // headings, paragraphs etc.\n  - inline-tools.js       // formatting like bold/italic\n  - table-tools.js        // row and column operations",
+            },
+          ],
+        },
+        {
+          type: "heading",
+          attrs: {
+            textAlign: "left",
+            level: 2,
+          },
+          content: [
+            {
+              type: "text",
+              text: "Tables",
+            },
+          ],
+        },
+        {
+          type: "paragraph",
+          attrs: {
+            blockWidth: "normal",
+            textAlign: "left",
+          },
+          content: [
+            {
+              type: "text",
+              text: "Tables use the same floating toolbar as other nodes. But they also have their own toolbar for row and column operations, which appears when a cell is selected.",
+            },
+          ],
+        },
+        {
           type: "table",
           content: [
             {
@@ -137,7 +273,7 @@ export default {
                   attrs: {
                     colspan: 1,
                     rowspan: 1,
-                    colwidth: [53],
+                    colwidth: [71],
                   },
                 },
                 {
@@ -147,6 +283,12 @@ export default {
                     rowspan: 1,
                     colwidth: null,
                   },
+                  content: [
+                    {
+                      type: "text",
+                      text: "Column 1",
+                    },
+                  ],
                 },
                 {
                   type: "tableHeader",
@@ -155,6 +297,12 @@ export default {
                     rowspan: 1,
                     colwidth: null,
                   },
+                  content: [
+                    {
+                      type: "text",
+                      text: "Column 2",
+                    },
+                  ],
                 },
                 {
                   type: "tableHeader",
@@ -163,6 +311,12 @@ export default {
                     rowspan: 1,
                     colwidth: null,
                   },
+                  content: [
+                    {
+                      type: "text",
+                      text: "Column 3",
+                    },
+                  ],
                 },
               ],
             },
@@ -174,8 +328,28 @@ export default {
                   attrs: {
                     colspan: 1,
                     rowspan: 1,
-                    colwidth: [53],
+                    colwidth: [71],
                   },
+                  content: [
+                    {
+                      type: "text",
+                      text: "Row A",
+                    },
+                  ],
+                },
+                {
+                  type: "tableCell",
+                  attrs: {
+                    colspan: 2,
+                    rowspan: 1,
+                    colwidth: null,
+                  },
+                  content: [
+                    {
+                      type: "text",
+                      text: "Merged cells",
+                    },
+                  ],
                 },
                 {
                   type: "tableCell",
@@ -184,22 +358,12 @@ export default {
                     rowspan: 1,
                     colwidth: null,
                   },
-                },
-                {
-                  type: "tableCell",
-                  attrs: {
-                    colspan: 1,
-                    rowspan: 1,
-                    colwidth: null,
-                  },
-                },
-                {
-                  type: "tableCell",
-                  attrs: {
-                    colspan: 1,
-                    rowspan: 1,
-                    colwidth: null,
-                  },
+                  content: [
+                    {
+                      type: "text",
+                      text: "Cell",
+                    },
+                  ],
                 },
               ],
             },
@@ -211,8 +375,14 @@ export default {
                   attrs: {
                     colspan: 1,
                     rowspan: 1,
-                    colwidth: [53],
+                    colwidth: [71],
                   },
+                  content: [
+                    {
+                      type: "text",
+                      text: "Row B",
+                    },
+                  ],
                 },
                 {
                   type: "tableCell",
@@ -221,6 +391,12 @@ export default {
                     rowspan: 1,
                     colwidth: null,
                   },
+                  content: [
+                    {
+                      type: "text",
+                      text: "Cell",
+                    },
+                  ],
                 },
                 {
                   type: "tableCell",
@@ -229,6 +405,12 @@ export default {
                     rowspan: 1,
                     colwidth: null,
                   },
+                  content: [
+                    {
+                      type: "text",
+                      text: "Cell",
+                    },
+                  ],
                 },
                 {
                   type: "tableCell",
@@ -237,8 +419,103 @@ export default {
                     rowspan: 1,
                     colwidth: null,
                   },
+                  content: [
+                    {
+                      type: "text",
+                      text: "Cell",
+                    },
+                  ],
                 },
               ],
+            },
+            {
+              type: "tableRow",
+              content: [
+                {
+                  type: "tableHeader",
+                  attrs: {
+                    colspan: 1,
+                    rowspan: 1,
+                    colwidth: [71],
+                  },
+                  content: [
+                    {
+                      type: "text",
+                      text: "Row C",
+                    },
+                  ],
+                },
+                {
+                  type: "tableCell",
+                  attrs: {
+                    colspan: 1,
+                    rowspan: 1,
+                    colwidth: null,
+                  },
+                  content: [
+                    {
+                      type: "text",
+                      text: "Cell",
+                    },
+                  ],
+                },
+                {
+                  type: "tableCell",
+                  attrs: {
+                    colspan: 2,
+                    rowspan: 1,
+                    colwidth: null,
+                  },
+                  content: [
+                    {
+                      type: "text",
+                      text: "Merged cells",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          type: "heading",
+          attrs: {
+            textAlign: "left",
+            level: 2,
+          },
+          content: [
+            {
+              type: "text",
+              text: "YouTube embeds",
+            },
+          ],
+        },
+        {
+          type: "paragraph",
+          attrs: {
+            blockWidth: "normal",
+            textAlign: "left",
+          },
+          content: [
+            {
+              type: "text",
+              text: "Paste a YouTube URL on a new line to embed it. YouTube embeds support the blockWidth option – the one below is set to ‘wide’.",
+            },
+          ],
+        },
+        {
+          type: "youtube",
+          attrs: {
+            blockWidth: "wide",
+            src: "https://www.youtube.com/watch?v=VcnROkRhJ34",
+            start: 0,
+            width: 640,
+            height: 480,
+          },
+          content: [
+            {
+              type: "text",
+              text: "YouTube embeds are wrapped in figure elements and can have a figcaption like this.",
             },
           ],
         },

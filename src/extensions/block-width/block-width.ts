@@ -58,7 +58,6 @@ export const BlockWidth = Extension.create<BlockWidthOptions>({
       setBlockWidth:
         (alignment: string) =>
         ({ commands, view }) => {
-          console.log("setting");
           if (!this.options.alignments.includes(alignment)) {
             return false;
           }

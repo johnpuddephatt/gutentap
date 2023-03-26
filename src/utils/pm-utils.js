@@ -59,32 +59,37 @@ export const GetTopLevelNode = function (view) {
 
 export const GetNodeTree = function (view) {
   let nodes = [];
-  const selectionStart = view.state.selection.$from;
+  let selectionStart = view.state.selection.$from;
+
+  if (selectionStart.node(1) == null && view.lastSelectedViewDesc) {
+    return [view.lastSelectedViewDesc.node.type.name];
+  }
+
   let depth = selectionStart.depth;
-  while (depth > 0) {
+  while (depth >= 0) {
     nodes.push(selectionStart.node(depth).type.name);
     depth--;
   }
-  return nodes;
+  return nodes.reverse();
 };
 
-export const GetTopLevelBlock = function (editor) {
-  const selectionStart = editor.view.state.selection.$from;
-  let parentNode = editor.view.domAtPos(selectionStart.posAtIndex(0, 1)).node;
-  if (parentNode == editor.view.dom) {
-    return editor.view.lastSelectedViewDesc?.nodeDOM;
-  }
+// export const GetTopLevelBlock = function (editor) {
+//   const selectionStart = editor.view.state.selection.$from;
+//   let parentNode = editor.view.domAtPos(selectionStart.posAtIndex(0, 1)).node;
+//   if (parentNode == editor.view.dom) {
+//     return editor.view.lastSelectedViewDesc?.nodeDOM;
+//   }
 
-  // Sometimes we get a node that isn't the top-level parent; e.g. codeBlock gives us the <code> not the wrapping <pre>
-  while (
-    parentNode != editor.view.dom &&
-    parentNode.parentNode != editor.view.dom
-  ) {
-    parentNode = parentNode.parentNode;
-  }
+//   // Sometimes we get a node that isn't the top-level parent; e.g. codeBlock gives us the <code> not the wrapping <pre>
+//   while (
+//     parentNode != editor.view.dom &&
+//     parentNode.parentNode != editor.view.dom
+//   ) {
+//     parentNode = parentNode.parentNode;
+//   }
 
-  return parentNode;
-};
+//   return parentNode;
+// };
 
 let mapChildren = function (node, callback) {
   const array = [];

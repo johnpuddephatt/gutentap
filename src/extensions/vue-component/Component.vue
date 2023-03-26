@@ -1,10 +1,11 @@
 <template>
-  <node-view-wrapper class="relative border-2 border-slate-400 rounded p-6">
+  <node-view-wrapper
+    contenteditable="false"
+    class="relative border-2 border-slate-400 rounded my-16 p-6"
+  >
     <span class="label">Vue Component</span>
 
     <div class="content">
-      <node-view-content class="bg-white p-2 border-2 rounded h-14" />
-
       <button
         class="border-2 border-slate-400 rounded px-2 mt-2"
         contenteditable="false"
@@ -17,12 +18,12 @@
 </template>
 
 <script>
-import { nodeViewProps, NodeViewWrapper, NodeViewContent } from "@tiptap/vue-3";
+import { nodeViewProps, NodeViewWrapper } from "@tiptap/vue-3";
 
 export default {
   components: {
     NodeViewWrapper,
-    NodeViewContent,
+    // NodeViewContent,
   },
 
   props: nodeViewProps,

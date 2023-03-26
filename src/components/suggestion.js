@@ -6,11 +6,9 @@ import blockTools from "../tools/block-tools";
 
 export default {
   items: ({ query }) => {
-    return blockTools()
-      .filter((item) =>
-        item.title.toLowerCase().startsWith(query.toLowerCase())
-      )
-      .slice(0, 10);
+    return blockTools().filter((item) =>
+      item.title.toLowerCase().startsWith(query.toLowerCase())
+    );
   },
 
   render: () => {
