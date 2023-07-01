@@ -26,9 +26,10 @@
         </svg>
       </a>
 
-      <tiptap
-        class="my-32 prose xl:prose-xl text-slate-600 max-w-none"
+      <gutentap
+        editorClass="my-32 prose xl:prose-xl text-slate-600 max-w-none"
         v-model="content"
+        mode="json"
       />
     </div>
     <div
@@ -38,24 +39,25 @@
         'translate-x-full': !showContent,
       }"
     >
-      <h3 class="font-bold mb-8 text-3xl">JSON output</h3>
+      <h3 class="font-bold mb-8 text-3xl">Editor output</h3>
       <pre class="block text-sm w-full">{{ content }}</pre>
     </div>
   </div>
 </template>
 
 <script>
-import Tiptap from "./components/TipTap.vue";
+import Gutentap from "./components/GutenTap.vue";
 
 export default {
   name: "App",
   components: {
-    Tiptap,
+    Gutentap,
   },
   data() {
     return {
       showContent: false,
-      content: [
+      content: [],
+      content2: [
         {
           type: "heading",
           attrs: {

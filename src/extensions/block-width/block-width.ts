@@ -61,20 +61,14 @@ export const BlockWidth = Extension.create<BlockWidthOptions>({
           if (!this.options.alignments.includes(alignment)) {
             return false;
           }
-
-          return this.options.types.every((type) => {
-            // blockquote is set here manually. It should be `type` but this just sets the blockwidth on the current child rather than the root (e.g. the blockquote)
-            // commands.updateAttributes(
-            //   view.state.selection.$from.node().type.name,
-            //   {
-            //     blockWidth: null,
-            //   }
-            // );
-
-            commands.updateAttributes(GetTopLevelNode(view).type.name, {
-              blockWidth: alignment,
-            });
+          this.options.types.forEach((type) => {
+            if (type == GetTopLevelNode(view).type.name) {
+              commands.updateAttributes(type, {
+                blockWidth: alignment,
+              });
+            }
           });
+          return true;
         },
 
       unsetBlockWidth:

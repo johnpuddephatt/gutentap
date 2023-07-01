@@ -1,7 +1,7 @@
 // import { Decoration, DecorationSet } from "prosemirror-view";
-import { Slice, Fragment } from "prosemirror-model";
-import { ReplaceStep } from "prosemirror-transform";
-import { Selection } from "prosemirror-state";
+import { Slice, Fragment } from "@tiptap/pm/model";
+import { ReplaceStep } from "@tiptap/pm/transform";
+import { Selection } from "@tiptap/pm/state";
 
 export const GetTopLevelBlockCoords = function (view) {
   const $pos = view.state.selection.$from;

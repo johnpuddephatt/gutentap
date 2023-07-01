@@ -12,7 +12,7 @@
         {{ item.title }}
       </button>
     </template>
-    <div class="item" v-else>No result</div>
+    <div class="p-2 text-slate-600 text-sm w-full" v-else>No result</div>
   </div>
 </template>
 

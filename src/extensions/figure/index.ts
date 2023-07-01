@@ -90,7 +90,7 @@ export const Figure = Node.create<FigureOptions>({
     return [
       "figure",
       mergeAttributes(this.options.HTMLAttributes, {
-        class: "p-8 bg-slate-100 rounded",
+        class: "border border-slate-100",
       }),
       [
         "img",
@@ -99,7 +99,12 @@ export const Figure = Node.create<FigureOptions>({
           contenteditable: false,
         }),
       ],
-      ["figcaption", 0],
+      [
+        "figcaption",
+        mergeAttributes(this.options.HTMLAttributes, {
+          class: "p-2",
+        }),
+      ],
     ];
   },
 

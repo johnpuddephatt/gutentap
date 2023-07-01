@@ -1,5 +1,7 @@
 <template>
-  <InlineSvg v-if="name" :src="require(`@/icons/${name}.svg`)" />
+  <InlineSvg src="../icons/drag.svg" />
+  <InlineSvg v-if="path" :src="path" />
+
   <span v-else v-html="icon"></span>
 </template>
 
@@ -9,7 +11,7 @@ import InlineSvg from "vue-inline-svg";
 export default {
   components: { InlineSvg },
   props: {
-    name: {
+    path: {
       type: String,
       required: false,
     },

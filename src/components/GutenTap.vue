@@ -13,19 +13,18 @@
       <menu-item>
         <menu-button
           title="Row tools"
-          icon-name="ellipsis-horizontal-circle"
           class="rounded-full text-slate-400 hover:text-slate-800"
-        ></menu-button>
+          :content="moreIconRound"
+        />
+
         <template #dropdown>
           <menu-dropdown-button
             v-for="tool in tableRowTools"
-            :iconSvg="tool.icon"
+            v-html="tool.icon + ' ' + tool.title"
             :key="tool.title"
             :label="tool.title"
             @click="tool.command(editor)"
-          >
-            {{ tool.title }}
-          </menu-dropdown-button>
+          />
         </template>
       </menu-item>
     </bubble-menu>
@@ -43,19 +42,17 @@
       <menu-item>
         <menu-button
           title="Column tools"
-          icon-name="ellipsis-horizontal-circle"
+          :content="moreIconRound"
           class="rounded-full text-slate-400 hover:text-slate-800"
-        ></menu-button>
+        />
         <template #dropdown>
           <menu-dropdown-button
             v-for="tool in tableColumnTools"
-            :iconSvg="tool.icon"
+            :content="tool.icon + ' ' + tool.title"
             :key="tool.title"
             :label="tool.title"
             @click="tool.command(editor)"
-          >
-            {{ tool.title }}
-          </menu-dropdown-button>
+          />
         </template>
       </menu-item>
     </bubble-menu>
@@ -66,7 +63,7 @@
       :draggable="dragging"
       :should-show="shouldShowMainToolbar"
       v-if="editor"
-      class="text-sm bg-white flex divide-x divide-slate-400 flex-row border-slate-400 rounded border"
+      class="text-sm bg-white max-w-screen flex divide-x divide-slate-400 flex-row border-slate-400 md:rounded border"
       :editor="editor"
       :class="{
         'pointer-events-none opacity-0': isTyping,
@@ -79,32 +76,43 @@
     >
       <div class="flex flex-row">
         <button
-          class="ml-1 my-2 w-6 h-8 hover:bg-slate-100 rounded"
+          @mousedown="startDragging($event)"
+          @mouseup="
+            draggedNodePosition = false;
+            dragging = false;
+          "
+          class="hidden md:block ml-1 my-2 w-6 h-8 hover:bg-slate-100 rounded"
           :class="{
             'cursor-grab': !dragging,
             'cursor-grabbing mr-1': dragging,
           }"
           aria-label="Drag"
           data-tooltip="Drag"
-          @mousedown="startDragging($event)"
-          @mouseup="
-            draggedNodePosition = false;
-            dragging = false;
-          "
         >
-          <svg-icon class="w-6 h-8" name="drag" />
+          <svg
+            width="24"
+            height="24"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path
+              d="M8 7h2V5H8v2zm0 6h2v-2H8v2zm0 6h2v-2H8v2zm6-14v2h2V5h-2zm0 8h2v-2h-2v2zm0 6h2v-2h-2v2z"
+            ></path>
+          </svg>
         </button>
 
         <div class="py-2 group relative" v-if="!dragging && currentBlockTool">
           <menu-item>
             <menu-button
               :title="currentBlockTool?.name"
-              :icon-svg="currentBlockTool?.icon"
+              :content="currentBlockTool?.icon"
               :class="
                 currentBlockTool?.canBeConverted &&
                 'group-focus-within:bg-slate-600 !cursor-pointer group-focus-within:text-white hover:bg-slate-50'
               "
-            ></menu-button>
+            />
             <template v-if="currentBlockTool?.canBeConverted" #dropdown>
               <div
                 class="p-3 uppercase text-gray-600 text-xs pb-1 tracking-wide"
@@ -113,15 +121,13 @@
               </div>
               <menu-dropdown-button
                 v-for="tool in blockTools.filter((tool) => tool.convertCommand)"
-                :iconSvg="tool.icon"
+                :content="tool.icon + ' ' + tool.title"
                 :key="tool.title"
                 :label="tool.title"
                 @click="tool.convertCommand(editor)"
                 activeClass="hidden"
                 :active="tool.isActiveTest(editor)"
-              >
-                {{ tool.title }}
-              </menu-dropdown-button>
+              />
             </template>
           </menu-item>
         </div>
@@ -133,7 +139,19 @@
             data-tooltip="Move up"
             class="mt-2"
           >
-            <svg-icon name="chevron-up" />
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path
+                d="M6.5 12.4L12 8l5.5 4.4-.9 1.2L12 10l-4.5 3.6-1-1.2z"
+              ></path>
+            </svg>
           </button>
           <button
             @click="moveNode('DOWN')"
@@ -141,7 +159,16 @@
             data-tooltip="Move down"
             class="-mt-3.5"
           >
-            <svg-icon name="chevron-down" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="currentColor"
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+            >
+              <path d="M17.5 11.6 12 16l-5.5-4.4.9-1.2L12 14l4.5-3.6 1 1.2z" />
+            </svg>
           </button>
         </div>
       </div>
@@ -156,23 +183,26 @@
         >
           <menu-button
             :title="
-              alignmentToolGroup.find((tool) => tool.isActiveTest(editor))
-                ?.title
+              alignmentToolGroup.find((tool) =>
+                tool.isActiveTest(editor, topLevelNodeType)
+              )?.title
             "
-            :icon-svg="
-              alignmentToolGroup.find((tool) => tool.isActiveTest(editor))?.icon
+            :content="
+              alignmentToolGroup.find((tool) =>
+                tool.isActiveTest(editor, topLevelNodeType)
+              )?.icon
             "
-          ></menu-button>
+          />
+
           <template #dropdown>
             <menu-dropdown-button
               v-for="tool in alignmentToolGroup"
               :key="tool.title"
-              :iconSvg="tool.icon"
+              :content="tool.icon + ' ' + tool.title"
               :label="tool.title"
               @click="tool.command(editor)"
               :active="tool.isActiveTest(editor, topLevelNodeType)"
-              >{{ tool.title }}</menu-dropdown-button
-            >
+            />
           </template>
         </menu-item>
       </div>
@@ -184,7 +214,7 @@
         <menu-button
           v-for="tool in currentBlockTool?.tools"
           :key="tool.name"
-          :iconSvg="tool.icon"
+          :content="tool.icon"
           :label="tool.title"
           :activeClass="tool.isActiveClass"
           @click="tool.command.call(0, editor)"
@@ -199,7 +229,7 @@
       >
         <menu-item align="right" :key="tool.title" v-for="tool in inlineTools">
           <menu-button
-            :iconSvg="tool.icon"
+            :content="tool.icon"
             :label="tool.title"
             :activeClass="tool.isActiveClass"
             @click="tool.command(editor)"
@@ -209,11 +239,10 @@
             <menu-dropdown-button
               v-for="tool in tool.tools"
               :key="tool.name"
-              :iconSvg="tool.icon"
+              :content="tool.icon + ' ' + tool.title"
               @click="tool.command(editor)"
               :active="tool.isActiveTest(editor)"
-              >{{ tool.title }}</menu-dropdown-button
-            >
+            />
           </template>
         </menu-item>
       </div>
@@ -223,44 +252,33 @@
         class="p-2 gap-1 flex group flex-row items-center relative"
       >
         <menu-item align="right">
-          <menu-button iconName="more" label="More"></menu-button>
+          <menu-button :content="moreIcon" label="More"></menu-button>
           <template #dropdown>
             <menu-dropdown-button
               ref="deleteButton"
-              iconName="delete"
+              :content="deleteIcon + ' Delete'"
               label="Delete block"
               @click="deleteNode(topLevelNodeType)"
-              >Delete</menu-dropdown-button
-            >
+            />
           </template>
         </menu-item>
       </div>
     </bubble-menu>
 
-    <div>
-      <editor-content
-        @keydown="isTyping = true"
-        @keyup.esc="isTyping = false"
-        ref="editor"
-        :editor="editor"
-      />
-    </div>
-    <div
-      v-if="editor"
-      class="text-base px-8 fixed bottom-0 bg-gray-100 py-1 border-t left-0 right-0 flex flex-row gap-2"
-    >
-      <div v-for="(node, key) in nodeTree" :key="node">
-        {{ node }} <span v-if="key < nodeTree.length - 1">&gt;</span>
-      </div>
-    </div>
+    <editor-content
+      :class="editorClass ?? 'prose'"
+      @keydown="isTyping = true"
+      @keyup.esc="isTyping = false"
+      ref="editor"
+      :editor="editor"
+    />
   </div>
 </template>
 
 <script>
-import SvgIcon from "./SvgIcon";
-import MenuButton from "./MenuButton";
-import MenuItem from "./MenuItem";
-import MenuDropdownButton from "./MenuDropdownButton";
+import MenuButton from "@/components/MenuButton.vue";
+import MenuItem from "@/components/MenuItem.vue";
+import MenuDropdownButton from "@/components/MenuDropdownButton.vue";
 
 import { BubbleMenu, Editor, EditorContent } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
@@ -284,7 +302,6 @@ import {
   GetTableColumnCoords,
   GetTableRowCoords,
   GetTopLevelNode,
-  GetNodeTree,
 } from "../utils/pm-utils.js";
 
 import BlockWidth from "../extensions/block-width";
@@ -303,12 +320,11 @@ import blockTools from "../tools/block-tools";
 import alignmentTools from "../tools/alignment-tools";
 
 export default {
-  props: ["modelValue"],
+  props: ["modelValue", "editorClass", "mode"],
 
   components: {
     BubbleMenu,
     EditorContent,
-    SvgIcon,
     MenuButton,
     MenuItem,
     MenuDropdownButton,
@@ -319,7 +335,6 @@ export default {
       dragging: false,
       draggedNodePosition: null,
       editor: null,
-      nodeTree: [],
       blockTools: blockTools(),
       inlineTools: inlineTools(),
       alignmentTools: alignmentTools(),
@@ -329,6 +344,12 @@ export default {
       currentBlockTool: null,
       isTyping: false,
       showMainToolbar: false,
+      moreIcon:
+        '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"/></svg>',
+      deleteIcon:
+        '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>',
+      moreIconRound:
+        '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
     };
   },
 
@@ -366,7 +387,7 @@ export default {
           placeholder: "Type / to choose a block",
         }),
         BlockWidth.configure({
-          types: ["paragraph", "horizontalRule", "blockquote", "youtube"],
+          types: ["horizontalRule", "blockquote", "youtube"],
         }),
         TextAlign.configure({
           types: ["heading", "paragraph"],
@@ -395,19 +416,28 @@ export default {
 
       onUpdate: () => {
         this.updateToolbar();
-        this.$emit("update:modelValue", this.editor.getJSON().content);
+        this.$emit(
+          "update:modelValue",
+          this.mode == "json"
+            ? this.editor.getJSON().content
+            : this.editor.getHTML()
+        );
       },
 
       onSelectionUpdate: () => {
         this.updateToolbar();
-        this.nodeTree = GetNodeTree(this.editor.view);
+        // this.nodeTree = GetNodeTree(this.editor.view);
       },
     });
 
-    this.editor.commands.setContent({
-      type: "doc",
-      content: this.modelValue,
-    });
+    this.editor.commands.setContent(
+      this.mode == "json"
+        ? {
+            type: "doc",
+            content: this.modelValue,
+          }
+        : this.modelValue
+    );
   },
 
   beforeUnmount() {
@@ -422,9 +452,15 @@ export default {
 
   computed: {
     activeAlignmentTools() {
-      return this.alignmentTools.filter((alignmentToolGroup) =>
-        alignmentToolGroup.find((tool) => tool.isActiveTest(this.editor))
-      );
+      if (this.topLevelNodeType) {
+        return this.alignmentTools.filter((alignmentToolGroup) =>
+          alignmentToolGroup.find((tool) =>
+            tool.isActiveTest(this.editor, this.topLevelNodeType)
+          )
+        );
+      } else {
+        return null;
+      }
     },
   },
 
@@ -434,7 +470,7 @@ export default {
     },
 
     shouldShowMainToolbar() {
-      return this.editor.isActive();
+      return this.editor.isActive() && this.modelValue;
     },
 
     updateToolbar() {
@@ -521,23 +557,5 @@ export default {
 </script>
 
 <style>
-hr {
-  height: auto;
-  border-top-width: 6px !important;
-  border-radius: 4px !important;
-  margin: 1.5rem 0;
-}
-
-[data-tooltip] {
-  position: relative;
-}
-
-[data-tooltip]:hover::after {
-  @apply translate-y-0 opacity-100;
-}
-
-[data-tooltip]::after {
-  content: attr(data-tooltip);
-  @apply whitespace-nowrap transition text-xs px-1.5 py-0.5 text-white bg-black rounded-sm absolute top-[calc(100%+1rem)] left-1/2 -translate-x-1/2 translate-y-1 opacity-0  pointer-events-none;
-}
+@import "@/style.css";
 </style>

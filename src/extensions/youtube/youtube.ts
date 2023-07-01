@@ -179,7 +179,7 @@ export const Youtube = Node.create<YoutubeOptions>({
       {
         "data-youtube-video": "",
         "data-block-width": blockWidth,
-        class: "bg-slate-100 p-4 rounded",
+        class: "bg-slate-100 pb-4 text-center",
       },
       [
         "iframe",
