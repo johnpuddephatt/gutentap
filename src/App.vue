@@ -56,8 +56,7 @@ export default {
   data() {
     return {
       showContent: false,
-      content: [],
-      content2: [
+      content: [
         {
           type: "heading",
           attrs: {

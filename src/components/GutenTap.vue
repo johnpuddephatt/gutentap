@@ -63,15 +63,22 @@
       :draggable="dragging"
       :should-show="shouldShowMainToolbar"
       v-if="editor"
-      class="text-sm bg-white max-w-screen flex divide-x divide-slate-400 flex-row border-slate-400 md:rounded border"
+      class="text-sm bg-white max-w-screen flex divide-x max-w-full divide-slate-400 flex-row border-slate-400 md:rounded border-t md:border"
       :editor="editor"
       :class="{
-        'pointer-events-none opacity-0': isTyping,
+        'mouse:pointer-events-none mouse:opacity-0': isTyping,
       }"
       :tippy-options="{
         maxWidth: 'none',
         placement: 'top-start',
         getReferenceClientRect: getMenuCoords,
+        onCreate: (instance) =>
+          instance.popper.classList.add(
+            'max-md:!sticky',
+            'max-md:!bottom-0',
+            'max-md:!top-auto',
+            'max-md:!transform-none'
+          ),
       }"
     >
       <div class="flex flex-row">
@@ -81,7 +88,7 @@
             draggedNodePosition = false;
             dragging = false;
           "
-          class="hidden md:block ml-1 my-2 w-6 h-8 hover:bg-slate-100 rounded"
+          class="hidden md:block ml-1 my-2 hover:bg-slate-100 rounded"
           :class="{
             'cursor-grab': !dragging,
             'cursor-grabbing mr-1': dragging,
@@ -96,6 +103,7 @@
             viewBox="0 0 24 24"
             aria-hidden="true"
             focusable="false"
+            class="w-5 h-5 md:w-6 md:h-6"
           >
             <path
               d="M8 7h2V5H8v2zm0 6h2v-2H8v2zm0 6h2v-2H8v2zm6-14v2h2V5h-2zm0 8h2v-2h-2v2zm0 6h2v-2h-2v2z"
@@ -103,7 +111,10 @@
           </svg>
         </button>
 
-        <div class="py-2 group relative" v-if="!dragging && currentBlockTool">
+        <div
+          class="py-1 md:py-2 group relative"
+          v-if="!dragging && currentBlockTool"
+        >
           <menu-item>
             <menu-button
               :title="currentBlockTool?.name"
@@ -137,11 +148,12 @@
             @click="moveNode('UP')"
             :disabled="!canMoveNodeUp()"
             data-tooltip="Move up"
-            class="mt-2"
+            class="mt-1 md:mt-2"
           >
             <svg
               width="24"
               height="24"
+              class="w-5 h-5 md:w-6 md:h-6"
               viewBox="0 0 24 24"
               xmlns="http://www.w3.org/2000/svg"
               fill="currentColor"
@@ -166,6 +178,7 @@
               fill="currentColor"
               aria-hidden="true"
               viewBox="0 0 24 24"
+              class="w-5 h-5 md:w-6 md:h-6"
             >
               <path d="M17.5 11.6 12 16l-5.5-4.4.9-1.2L12 14l4.5-3.6 1 1.2z" />
             </svg>
@@ -174,7 +187,7 @@
       </div>
 
       <div
-        class="flex gap-1 items-center hide-empty flex-row p-2"
+        class="flex gap-1 items-center hide-empty flex-row p-1 md:p-2"
         v-if="!dragging"
       >
         <menu-item
@@ -209,7 +222,7 @@
 
       <div
         v-if="!dragging && currentBlockTool?.tools?.length"
-        class="gap-1 flex flex-row items-center p-2"
+        class="gap-1 flex flex-row items-center p-1 md:p-2"
       >
         <menu-button
           v-for="tool in currentBlockTool?.tools"
@@ -225,7 +238,7 @@
 
       <div
         v-if="currentBlockTool?.hasInlineTools && !dragging"
-        class="p-2 gap-1 flex relative flex-row items-center"
+        class="p-1 gap-0.5 md:p-2 md:gap-1 flex relative flex-row items-center"
       >
         <menu-item align="right" :key="tool.title" v-for="tool in inlineTools">
           <menu-button
@@ -249,10 +262,10 @@
 
       <div
         v-if="editor && editor.can().deleteNode(topLevelNodeType) && !dragging"
-        class="p-2 gap-1 flex group flex-row items-center relative"
+        class="p-1 gap-0.5 md:p-2 md:gap-1 flex group flex-row items-center relative"
       >
         <menu-item align="right">
-          <menu-button :content="moreIcon" label="More"></menu-button>
+          <menu-button :content="moreIcon" label="More options"></menu-button>
           <template #dropdown>
             <menu-dropdown-button
               ref="deleteButton"
@@ -305,7 +318,6 @@ import {
 } from "../utils/pm-utils.js";
 
 import BlockWidth from "../extensions/block-width";
-import VueComponent from "../extensions/vue-component";
 import FilepondGallery from "../extensions/filepond-gallery";
 import { Figure } from "../extensions/figure";
 import { Youtube } from "../extensions/youtube";
@@ -320,7 +332,7 @@ import blockTools from "../tools/block-tools";
 import alignmentTools from "../tools/alignment-tools";
 
 export default {
-  props: ["modelValue", "editorClass", "mode"],
+  props: ["modelValue", "editorClass", "mode", "extensions"],
 
   components: {
     BubbleMenu,
@@ -345,11 +357,11 @@ export default {
       isTyping: false,
       showMainToolbar: false,
       moreIcon:
-        '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"/></svg>',
+        '<svg class="w-5 h-5 md:w-6 md:h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"/></svg>',
       deleteIcon:
-        '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>',
+        '<svg class="w-5 h-5 md:w-6 md:h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>',
       moreIconRound:
-        '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+        '<svg class="w-5 h-5 md:w-6 md:h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
     };
   },
 
@@ -364,54 +376,56 @@ export default {
   mounted() {
     this.editor = new Editor({
       extensions: [
-        StarterKit.configure({
-          blockquote: false,
-        }),
-        Blockquote.extend({
-          content: "paragraph",
-        }),
-        VueComponent,
-        FilepondGallery,
-        TrailingNode,
-        Subscript,
-        Superscript,
-        Highlight,
-        Figure,
-        Commands.configure({
-          suggestion,
-        }),
-        Link.configure({
-          openOnClick: false,
-        }),
-        Placeholder.configure({
-          placeholder: "Type / to choose a block",
-        }),
-        BlockWidth.configure({
-          types: ["horizontalRule", "blockquote", "youtube"],
-        }),
-        TextAlign.configure({
-          types: ["heading", "paragraph"],
-        }),
-        Table.configure({
-          resizable: true,
-        }),
-        TableRow.extend({
-          allowGapCursor: false,
-        }),
-        TableHeader.extend({
-          content: "(inline|hardBreak?)*",
-          isolating: false,
-        }),
-        TableCell.extend({
-          content: "(inline|hardBreak?)*",
-          isolating: false,
-        }),
-        Youtube.configure({
-          inline: false,
-          HTMLAttributes: {
-            class: "aspect-video h-auto w-full",
-          },
-        }),
+        ...[
+          StarterKit.configure({
+            blockquote: false,
+          }),
+          Blockquote.extend({
+            content: "paragraph",
+          }),
+          FilepondGallery,
+          TrailingNode,
+          Subscript,
+          Superscript,
+          Highlight,
+          Figure,
+          Commands.configure({
+            suggestion,
+          }),
+          Link.configure({
+            openOnClick: false,
+          }),
+          Placeholder.configure({
+            placeholder: "Type / to choose a block",
+          }),
+          BlockWidth.configure({
+            types: ["horizontalRule", "blockquote", "youtube"],
+          }),
+          TextAlign.configure({
+            types: ["heading", "paragraph"],
+          }),
+          Table.configure({
+            resizable: true,
+          }),
+          TableRow.extend({
+            allowGapCursor: false,
+          }),
+          TableHeader.extend({
+            content: "(inline|hardBreak?)*",
+            isolating: false,
+          }),
+          TableCell.extend({
+            content: "(inline|hardBreak?)*",
+            isolating: false,
+          }),
+          Youtube.configure({
+            inline: false,
+            HTMLAttributes: {
+              class: "aspect-video h-auto w-full",
+            },
+          }),
+        ],
+        ...(this.extensions ?? []),
       ],
 
       onUpdate: () => {

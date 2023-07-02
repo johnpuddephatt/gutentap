@@ -4,7 +4,7 @@
 
     <div
       v-if="hasDropdown"
-      class="z-10 bg-white shadow py-2 group-focus-within:block hidden overflow-hidden whitespace-nowrap absolute top-full mt-4 rounded border border-slate-400"
+      class="z-10 bg-white shadow py-2 group-focus-within:block hidden overflow-hidden whitespace-nowrap absolute bottom-full sm:bottom-auto sm:top-full mt-4 rounded border border-slate-400"
       :class="align == 'left' ? 'left-0' : 'right-0'"
     >
       <slot name="dropdown"> </slot>

@@ -12,7 +12,8 @@
 
 [data-tooltip]::after {
   content: attr(data-tooltip);
-  @apply whitespace-nowrap transition text-xs px-1.5 py-0.5 text-white bg-black rounded-sm absolute top-[calc(100%+1rem)] left-1/2 -translate-x-1/2 translate-y-1 opacity-0  pointer-events-none;
+  width: max-content;
+  @apply max-w-[8em] transition text-xs px-1.5 py-0.5 text-white bg-black rounded-sm absolute bottom-[calc(100%+0.5rem)] md:bottom-auto md:top-[calc(100%+1rem)] left-1/2 -translate-x-1/2 translate-y-1 opacity-0  pointer-events-none;
 }
 
 [disabled] {
@@ -20,15 +21,15 @@
 }
 
 .ProseMirror > * {
-  @apply max-w-2xl mx-auto;
+  @apply max-w-2xl mx-auto max-sm:px-4;
 }
 
 [data-block-width="wide"] {
-  @apply max-w-4xl;
+  @apply max-w-4xl  !important;
 }
 
 [data-block-width="full"] {
-  @apply max-w-none;
+  @apply max-w-none px-0 !important;
 }
 
 .hide-empty:empty {
