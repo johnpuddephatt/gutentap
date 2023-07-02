@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="gutentap">
     <bubble-menu
       v-if="editor && tableRowTools"
       :editor="editor"

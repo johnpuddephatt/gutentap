@@ -31,7 +31,7 @@ export default {
 
         popup = tippy("body", {
           getReferenceClientRect: props.clientRect,
-          appendTo: () => document.body,
+          appendTo: () => document.getElementById("gutentap"),
           content: component.element,
           showOnCreate: true,
           interactive: true,
