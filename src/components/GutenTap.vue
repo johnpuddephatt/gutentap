@@ -381,12 +381,10 @@ export default {
           Blockquote.extend({
             content: "paragraph",
           }),
-          FilepondGallery,
           TrailingNode,
           Subscript,
           Superscript,
           Highlight,
-          Figure,
           Commands.configure({
             suggestion,
           }),

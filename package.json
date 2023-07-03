@@ -1,6 +1,6 @@
 {
   "name": "gutentap",
-  "version": "0.1.40",
+  "version": "0.1.42",
   "private": false,
   "type": "module",
   "files": [
@@ -47,14 +47,10 @@
     "@tiptap/vue-3": "^2.0.0",
     "@vitejs/plugin-vue": "^4.2.3",
     "core-js": "^3.8.3",
-    "filepond": "^4.30.4",
-    "filepond-plugin-file-validate-type": "^1.2.8",
-    "filepond-plugin-image-preview": "^4.6.11",
     "sass-loader": "^13.1.0",
     "tippy.js": "^6.3.7",
     "vite": "^4.3.9",
     "vue": "^3.2.40",
-    "vue-filepond": "^7.0.3",
     "vue-inline-svg": "^3.1.2"
   },
   "devDependencies": {
