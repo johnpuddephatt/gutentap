@@ -6,6 +6,8 @@ module.exports = {
   theme: {
     extend: {},
   },
+  important: "#gutentap",
+
   plugins: [
     require("@tailwindcss/typography"),
     plugin(function ({ addVariant }) {

@@ -318,8 +318,6 @@ import {
 } from "../utils/pm-utils.js";
 
 import BlockWidth from "../extensions/block-width";
-import FilepondGallery from "../extensions/filepond-gallery";
-import { Figure } from "../extensions/figure";
 import { Youtube } from "../extensions/youtube";
 import { TrailingNode } from "../extensions/trailing-node";
 
