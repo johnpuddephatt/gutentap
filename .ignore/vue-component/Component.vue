@@ -3,7 +3,7 @@
     <span class="label" contenteditable="false">Vue Component</span>
 
     <div contenteditable="false" class="content">
-      <button @click="increase">
+      <button @click.prevent="increase">
         This button has been clicked {{ node.attrs.count }} times.
       </button>
     </div>

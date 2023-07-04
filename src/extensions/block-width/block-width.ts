@@ -61,13 +61,13 @@ export const BlockWidth = Extension.create<BlockWidthOptions>({
           if (!this.options.alignments.includes(alignment)) {
             return false;
           }
-          this.options.types.forEach((type) => {
-            if (type == GetTopLevelNode(view).type.name) {
-              commands.updateAttributes(type, {
-                blockWidth: alignment,
-              });
-            }
+          // this.options.types.forEach((type) => {
+          // if (type == GetTopLevelNode(view).type.name) {
+          commands.updateAttributes(GetTopLevelNode(view).type.name, {
+            blockWidth: alignment,
           });
+          // }
+          // });
           return true;
         },
 

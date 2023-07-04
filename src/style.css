@@ -1,6 +1,10 @@
 @tailwind components;
 @tailwind utilities;
 
+[data-variant="large"] {
+  @apply text-2xl;
+}
+
 [data-tooltip] {
   position: relative;
 }

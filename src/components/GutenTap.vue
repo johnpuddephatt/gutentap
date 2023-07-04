@@ -23,7 +23,7 @@
             v-html="tool.icon + ' ' + tool.title"
             :key="tool.title"
             :label="tool.title"
-            @click="tool.command(editor)"
+            @click.prevent="tool.command(editor)"
           />
         </template>
       </menu-item>
@@ -51,7 +51,7 @@
             :content="tool.icon + ' ' + tool.title"
             :key="tool.title"
             :label="tool.title"
-            @click="tool.command(editor)"
+            @click.prevent="tool.command(editor)"
           />
         </template>
       </menu-item>
@@ -131,11 +131,13 @@
                 Transform to
               </div>
               <menu-dropdown-button
-                v-for="tool in blockTools.filter((tool) => tool.convertCommand)"
+                v-for="tool in allBlockTools.filter(
+                  (tool) => tool.convertCommand
+                )"
                 :content="tool.icon + ' ' + tool.title"
                 :key="tool.title"
                 :label="tool.title"
-                @click="tool.convertCommand(editor)"
+                @click.prevent="tool.convertCommand(editor)"
                 activeClass="hidden"
                 :active="tool.isActiveTest(editor)"
               />
@@ -145,7 +147,7 @@
 
         <div class="pr-2 flex flex-col" v-if="!dragging">
           <button
-            @click="moveNode('UP')"
+            @click.prevent="moveNode('UP')"
             :disabled="!canMoveNodeUp()"
             data-tooltip="Move up"
             class="mt-1 md:mt-2"
@@ -166,7 +168,7 @@
             </svg>
           </button>
           <button
-            @click="moveNode('DOWN')"
+            @click.prevent="moveNode('DOWN')"
             :disabled="!canMoveNodeDown()"
             data-tooltip="Move down"
             class="-mt-3.5"
@@ -213,7 +215,7 @@
               :key="tool.title"
               :content="tool.icon + ' ' + tool.title"
               :label="tool.title"
-              @click="tool.command(editor)"
+              @click.prevent="tool.command(editor)"
               :active="tool.isActiveTest(editor, topLevelNodeType)"
             />
           </template>
@@ -230,7 +232,7 @@
           :content="tool.icon"
           :label="tool.title"
           :activeClass="tool.isActiveClass"
-          @click="tool.command.call(0, editor)"
+          @click.prevent="tool.command.call(0, editor)"
           :disabled="tool.isDisabledTest?.call(0, editor)"
           :active="tool.isActiveTest?.call(0, editor)"
         ></menu-button>
@@ -240,12 +242,16 @@
         v-if="currentBlockTool?.hasInlineTools && !dragging"
         class="p-1 gap-0.5 md:p-2 md:gap-1 flex relative flex-row items-center"
       >
-        <menu-item align="right" :key="tool.title" v-for="tool in inlineTools">
+        <menu-item
+          align="right"
+          :key="tool.title"
+          v-for="tool in allInlineTools"
+        >
           <menu-button
             :content="tool.icon"
             :label="tool.title"
             :activeClass="tool.isActiveClass"
-            @click="tool.command(editor)"
+            @click.prevent="tool.command(editor)"
             :active="tool.isActiveTest(editor)"
           ></menu-button>
           <template #dropdown>
@@ -253,7 +259,7 @@
               v-for="tool in tool.tools"
               :key="tool.name"
               :content="tool.icon + ' ' + tool.title"
-              @click="tool.command(editor)"
+              @click.prevent="tool.command(editor)"
               :active="tool.isActiveTest(editor)"
             />
           </template>
@@ -271,7 +277,7 @@
               ref="deleteButton"
               :content="deleteIcon + ' Delete'"
               label="Delete block"
-              @click="deleteNode(topLevelNodeType)"
+              @click.prevent="deleteNode(topLevelNodeType)"
             />
           </template>
         </menu-item>
@@ -306,7 +312,6 @@ import Blockquote from "@tiptap/extension-blockquote";
 import Subscript from "@tiptap/extension-subscript";
 import Superscript from "@tiptap/extension-superscript";
 import Highlight from "@tiptap/extension-highlight";
-// import Youtube from "@tiptap/extension-youtube/src/index.ts";
 
 import {
   DragNode,
@@ -317,20 +322,49 @@ import {
   GetTopLevelNode,
 } from "../utils/pm-utils.js";
 
+import { mergeArrays } from "../utils/utils";
+
 import BlockWidth from "../extensions/block-width";
 import { Youtube } from "../extensions/youtube";
 import { TrailingNode } from "../extensions/trailing-node";
 
+import Variants from "../extensions/variants";
+
 import Commands from "./commands";
 import suggestion from "./suggestion";
 
-import inlineTools from "../tools/inline-tools";
+import defaultBlockTools from "../tools/block-tools";
+import defaultInlineTools from "../tools/inline-tools";
+import defaultAlignmentTools from "../tools/alignment-tools";
 import { tableRowTools, tableColumnTools } from "../tools/table-tools";
-import blockTools from "../tools/block-tools";
-import alignmentTools from "../tools/alignment-tools";
 
 export default {
-  props: ["modelValue", "editorClass", "mode", "extensions"],
+  props: {
+    modelValue: {},
+    editorClass: {
+      type: String,
+    },
+    mode: {
+      type: String,
+      default: "html",
+    },
+    extensions: {
+      type: Array,
+      default: [],
+    },
+    blockTools: {
+      type: Array,
+      default: [],
+    },
+    inlineTools: {
+      type: Array,
+      default: [],
+    },
+    alignmentTools: {
+      type: Array,
+      default: [],
+    },
+  },
 
   components: {
     BubbleMenu,
@@ -345,9 +379,12 @@ export default {
       dragging: false,
       draggedNodePosition: null,
       editor: null,
-      blockTools: blockTools(),
-      inlineTools: inlineTools(),
-      alignmentTools: alignmentTools(),
+      allBlockTools: mergeArrays(defaultBlockTools(), this.blockTools),
+      allInlineTools: mergeArrays(defaultInlineTools(), this.inlineTools),
+      allAlignmentTools: mergeArrays(
+        defaultAlignmentTools(),
+        this.alignmentTools
+      ),
       tableRowTools: tableRowTools(),
       tableColumnTools: tableColumnTools(),
       topLevelNodeType: null,
@@ -395,7 +432,17 @@ export default {
             placeholder: "Type / to choose a block",
           }),
           BlockWidth.configure({
-            types: ["horizontalRule", "blockquote", "youtube"],
+            types: ["paragraph", "horizontalRule", "blockquote", "youtube"],
+          }),
+          Variants.configure({
+            types: [
+              "paragraph",
+              "heading",
+              "horizontalRule",
+              "blockquote",
+              "list",
+              "youtube",
+            ],
           }),
           TextAlign.configure({
             types: ["heading", "paragraph"],
@@ -463,7 +510,7 @@ export default {
   computed: {
     activeAlignmentTools() {
       if (this.topLevelNodeType) {
-        return this.alignmentTools.filter((alignmentToolGroup) =>
+        return this.allAlignmentTools.filter((alignmentToolGroup) =>
           alignmentToolGroup.find((tool) =>
             tool.isActiveTest(this.editor, this.topLevelNodeType)
           )
@@ -488,7 +535,7 @@ export default {
     },
 
     getCurrentBlockTool() {
-      return this.blockTools.find(
+      return this.allBlockTools.find(
         (tool) =>
           tool.name == this.topLevelNodeType ||
           tool.tools?.find((tool) => tool.name == this.topLevelNodeType)

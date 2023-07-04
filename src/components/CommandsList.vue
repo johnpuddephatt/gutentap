@@ -6,7 +6,7 @@
         :class="{ 'bg-slate-100': index === selectedIndex }"
         v-for="(item, index) in itemsWithInsertCommand"
         :key="index"
-        @click="selectItem(index)"
+        @click.prevent="selectItem(index)"
       >
         <span v-html="item.icon"></span>
         {{ item.title }}
