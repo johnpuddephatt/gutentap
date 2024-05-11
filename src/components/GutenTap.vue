@@ -351,6 +351,10 @@ export default {
     editable: {
       default: true,
     },
+    placeholder: {
+      type: String,
+      default: "Type / to choose a block",
+    },
     editorClass: {
       type: String,
     },
@@ -452,7 +456,7 @@ export default {
           openOnClick: false,
         }),
         Placeholder.configure({
-          placeholder: "Type / to choose a block",
+          placeholder: this.placeholder,
         }),
         BlockWidth.configure({
           types: this.blockWidthTypes,
