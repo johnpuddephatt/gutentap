@@ -43,7 +43,6 @@ export const mergeArrays = function (target, source) {
     } else {
       mergeDeep(
         target.find((targetItem) => targetItem.name == sourceItem.name),
-
         sourceItem
       );
     }

@@ -1,5 +1,5 @@
 <template>
-  <div id="gutentap">
+  <div class="gutentap">
     <div class="h-screen lg:grid lg:grid-cols-3">
       <div class="relative col-span-2 h-screen overflow-y-auto">
         <button
@@ -32,7 +32,13 @@
           v-model="content"
           mode="json"
           :blockTools="blockTools"
-          :extensions="[Filepond]"
+          :extensions="extensions"
+          :blockWidthTypes="[
+            'vueComponent',
+            'horizontalRule',
+            'blockquote',
+            'youtube',
+          ]"
         />
       </div>
       <div
@@ -52,6 +58,7 @@
 <script>
 import Gutentap from "./components/GutenTap.vue";
 import sampleContent from "./content.json";
+import VueComponent from "./extensions/vue-component";
 
 export default {
   name: "App",
@@ -61,6 +68,23 @@ export default {
   data() {
     return {
       showContent: false,
+      extensions: [VueComponent],
+      // alignmentTools: [
+      //   [
+      //     {
+      //       title: "Sidebar",
+      //       icon: '<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" x="0" y="0" enable-background="new 0 0 24 24" version="1.1" viewBox="0 0 24 24"><path d="M14.7 9v6h5.9V9h-5.9zm2.6-2.9H5.1v1.5h12.3V6.1zM5.1 17.9h11.7v-1.5H5.1v1.5zm8-6.6h-8v1.5h8v-1.5z"/></svg>',
+      //       command: (editor) => {
+      //         editor.chain().focus().setBlockWidth("full").run();
+      //       },
+      //       isActiveTest: (editor, topLevelNodeType) =>
+      //         editor.isActive(topLevelNodeType, {
+      //           blockWidth: "full",
+      //         }),
+      //     },
+      //   ],
+      // ],
+
       blockTools: [
         {
           name: "paragraph",
@@ -84,6 +108,23 @@ export default {
               isActiveTest: (editor) => editor.isActive({ variant: "large" }),
             },
           ],
+        },
+        {
+          name: "vueComponent",
+          title: "Sample Vue component",
+          icon: '<svg  width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 32 32"><path d="M24.3,4h-4.8L16,9.6L13,4H2l14,24L30,4L24.3,4z M5.5,6h3.4L16,18.4L23.1,6h3.4L16,24L5.5,6z"/></svg>',
+          insertCommand: ({ editor, range }) => {
+            editor
+              .chain()
+              .focus()
+              .deleteRange(range)
+              .insertContent(
+                '<div><vue-component count="0"></vue-component></div>'
+              )
+              .run();
+          },
+          hasInlineTools: false,
+          isActiveTest: (editor) => editor.isActive("vueComponent"),
         },
       ],
       content: sampleContent,

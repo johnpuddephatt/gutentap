@@ -55,6 +55,17 @@ export default function () {
         isActiveTest: (editor, topLevelNodeType) =>
           editor.isActive(topLevelNodeType, { blockWidth: "full" }),
       },
+      {
+        title: "Sidebar",
+        icon: '<svg  class="w-5 h-5 md:w-6 md:h-6" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" x="0" y="0" enable-background="new 0 0 24 24" version="1.1" viewBox="0 0 24 24"><path  fill="currentColor" d="M14.7 9v6h5.9V9h-5.9zm2.6-2.9H5.1v1.5h12.3V6.1zM5.1 17.9h11.7v-1.5H5.1v1.5zm8-6.6h-8v1.5h8v-1.5z"/></svg>',
+        command: (editor) => {
+          editor.chain().focus().setBlockWidth("sidebar").run();
+        },
+        isActiveTest: (editor, topLevelNodeType) =>
+          editor.isActive(topLevelNodeType, {
+            blockWidth: "sidebar",
+          }),
+      },
     ],
   ];
 }

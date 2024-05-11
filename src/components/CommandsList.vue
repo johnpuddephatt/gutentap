@@ -82,7 +82,7 @@ export default {
     },
 
     selectItem(index) {
-      const item = this.items[index];
+      const item = this.itemsWithInsertCommand[index];
 
       if (item) {
         this.command(item);

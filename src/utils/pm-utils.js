@@ -109,24 +109,31 @@ export const DragNode = function ({
 }) {
   let targetResolved = state.doc.resolve(targetNodePosition);
   let draggedNode = state.doc.resolve(draggedNodePosition).node(1);
-  let targetNode = targetResolved.node(1);
-  let tr = view.state.tr;
+  let targetNode = targetResolved.node(1) ?? targetResolved.nodeAfter;
+
+  // Get document; children; start and end – always the same!
   const parent = targetResolved.node(0);
   const parentPos = targetResolved.start(0);
-
+  let tr = view.state.tr;
   const arr = mapChildren(parent, (node) => node);
-  let fromIndex = arr.indexOf(draggedNode);
-  let targetIndex = arr.indexOf(targetNode);
   let replaceStart = parentPos;
   let replaceEnd = targetResolved.end(0);
+
+  let fromIndex = arr.indexOf(draggedNode);
+  let targetIndex = arr.indexOf(targetNode);
+
+  // Index is different when target is after dragged node
+  if (targetIndex > fromIndex) {
+    --targetIndex;
+  }
   let arrItem = arr[fromIndex];
+
   arr.splice(fromIndex, 1);
   arr.splice(targetIndex, 0, arrItem);
+
   const slice = new Slice(Fragment.fromArray(arr), 0, 0);
   tr.step(new ReplaceStep(replaceStart, replaceEnd, slice, false));
-
   tr.setSelection(Selection.near(tr.doc.resolve(targetNodePosition)));
-
   view.dispatch(tr);
 };
 

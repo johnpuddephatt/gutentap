@@ -27,7 +27,7 @@ export const BlockWidth = Extension.create<BlockWidthOptions>({
   addOptions() {
     return {
       types: [],
-      alignments: ["normal", "wide", "full"],
+      alignments: ["normal", "wide", "full", "sidebar"],
       defaultAlignment: "normal",
     };
   },

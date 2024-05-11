@@ -37,6 +37,9 @@ export const Variants = Extension.create<VariantsOptions>({
 
             parseHTML: (element) => element.dataset.variant,
             renderHTML: (attributes) => {
+              if (attributes.variant === this.options.defaultVariant) {
+                return {};
+              }
               return {
                 "data-variant": attributes.variant,
               };

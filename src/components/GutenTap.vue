@@ -1,5 +1,5 @@
 <template>
-  <div id="gutentap">
+  <div class="gutentap">
     <bubble-menu
       v-if="editor && tableRowTools"
       :editor="editor"
@@ -83,6 +83,7 @@
     >
       <div class="flex flex-row">
         <button
+          @click.prevent
           @mousedown="startDragging($event)"
           @mouseup="
             draggedNodePosition = false;
@@ -117,6 +118,7 @@
         >
           <menu-item>
             <menu-button
+              @click.prevent
               :title="currentBlockTool?.name"
               :content="currentBlockTool?.icon"
               :class="
@@ -155,7 +157,7 @@
             <svg
               width="24"
               height="24"
-              class="w-5 h-5 md:w-6 md:h-6"
+              class="pointer-events-none w-5 h-5 md:w-6 md:h-6"
               viewBox="0 0 24 24"
               xmlns="http://www.w3.org/2000/svg"
               fill="currentColor"
@@ -171,7 +173,7 @@
             @click.prevent="moveNode('DOWN')"
             :disabled="!canMoveNodeDown()"
             data-tooltip="Move down"
-            class="-mt-3.5"
+            class="-mt-1.5"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -180,7 +182,7 @@
               fill="currentColor"
               aria-hidden="true"
               viewBox="0 0 24 24"
-              class="w-5 h-5 md:w-6 md:h-6"
+              class="pointer-events-none -mt-2 w-5 h-5 md:w-6 md:h-6"
             >
               <path d="M17.5 11.6 12 16l-5.5-4.4.9-1.2L12 14l4.5-3.6 1 1.2z" />
             </svg>
@@ -197,6 +199,7 @@
           :key="key"
         >
           <menu-button
+            @click.prevent
             :title="
               alignmentToolGroup.find((tool) =>
                 tool.isActiveTest(editor, topLevelNodeType)
@@ -271,7 +274,11 @@
         class="p-1 gap-0.5 md:p-2 md:gap-1 flex group flex-row items-center relative"
       >
         <menu-item align="right">
-          <menu-button :content="moreIcon" label="More options"></menu-button>
+          <menu-button
+            @click.prevent
+            :content="moreIcon"
+            label="More options"
+          ></menu-button>
           <template #dropdown>
             <menu-dropdown-button
               ref="deleteButton"
@@ -364,6 +371,21 @@ export default {
       type: Array,
       default: [],
     },
+    blockWidthTypes: {
+      type: Array,
+      default: ["horizontalRule", "blockquote", "youtube"],
+    },
+    variantsTypes: {
+      type: Array,
+      default: [
+        "paragraph",
+        "heading",
+        "horizontalRule",
+        "blockquote",
+        "list",
+        "youtube",
+      ],
+    },
   },
 
   components: {
@@ -381,10 +403,9 @@ export default {
       editor: null,
       allBlockTools: mergeArrays(defaultBlockTools(), this.blockTools),
       allInlineTools: mergeArrays(defaultInlineTools(), this.inlineTools),
-      allAlignmentTools: mergeArrays(
-        defaultAlignmentTools(),
-        this.alignmentTools
-      ),
+      allAlignmentTools: this.alignmentTools.length
+        ? this.alignmentTools
+        : defaultAlignmentTools(),
       tableRowTools: tableRowTools(),
       tableColumnTools: tableColumnTools(),
       topLevelNodeType: null,
@@ -411,64 +432,55 @@ export default {
   mounted() {
     this.editor = new Editor({
       extensions: [
-        ...[
-          StarterKit.configure({
-            blockquote: false,
-          }),
-          Blockquote.extend({
-            content: "paragraph",
-          }),
-          TrailingNode,
-          Subscript,
-          Superscript,
-          Highlight,
-          Commands.configure({
-            suggestion,
-          }),
-          Link.configure({
-            openOnClick: false,
-          }),
-          Placeholder.configure({
-            placeholder: "Type / to choose a block",
-          }),
-          BlockWidth.configure({
-            types: ["paragraph", "horizontalRule", "blockquote", "youtube"],
-          }),
-          Variants.configure({
-            types: [
-              "paragraph",
-              "heading",
-              "horizontalRule",
-              "blockquote",
-              "list",
-              "youtube",
-            ],
-          }),
-          TextAlign.configure({
-            types: ["heading", "paragraph"],
-          }),
-          Table.configure({
-            resizable: true,
-          }),
-          TableRow.extend({
-            allowGapCursor: false,
-          }),
-          TableHeader.extend({
-            content: "(inline|hardBreak?)*",
-            isolating: false,
-          }),
-          TableCell.extend({
-            content: "(inline|hardBreak?)*",
-            isolating: false,
-          }),
-          Youtube.configure({
-            inline: false,
-            HTMLAttributes: {
-              class: "aspect-video h-auto w-full",
-            },
-          }),
-        ],
-        ...(this.extensions ?? []),
+        StarterKit.configure({
+          blockquote: false,
+        }),
+        Blockquote.extend({
+          content: "paragraph",
+        }),
+        TrailingNode,
+        Subscript,
+        Superscript,
+        Highlight,
+        Commands.configure({
+          suggestion: suggestion(this.allBlockTools),
+        }),
+        Link.configure({
+          openOnClick: false,
+        }),
+        Placeholder.configure({
+          placeholder: "Type / to choose a block",
+        }),
+        BlockWidth.configure({
+          types: this.blockWidthTypes,
+        }),
+        Variants.configure({
+          types: this.variantsTypes,
+        }),
+        TextAlign.configure({
+          types: ["heading", "paragraph"],
+        }),
+        Table.configure({
+          resizable: true,
+        }),
+        TableRow.extend({
+          allowGapCursor: false,
+        }),
+        TableHeader.extend({
+          content: "(inline|hardBreak?)*",
+          isolating: false,
+        }),
+        TableCell.extend({
+          content: "(inline|hardBreak?)*",
+          isolating: false,
+        }),
+        Youtube.configure({
+          inline: false,
+          HTMLAttributes: {
+            class: "aspect-video h-auto w-full",
+          },
+        }),
+        ...this.extensions,
       ],
 
       onUpdate: () => {

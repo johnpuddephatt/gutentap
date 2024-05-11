@@ -1,73 +1,73 @@
 @tailwind components;
 @tailwind utilities;
 
-[data-variant="large"] {
+.gutentap [data-variant="large"] {
   @apply text-2xl;
 }
 
-[data-tooltip] {
+.gutentap [data-tooltip] {
   position: relative;
 }
 
-[data-tooltip]:hover::after {
+.gutentap [data-tooltip]:hover::after {
   @apply translate-y-0 opacity-100;
 }
 
-[data-tooltip]::after {
+.gutentap [data-tooltip]::after {
   content: attr(data-tooltip);
   width: max-content;
   @apply max-w-[8em] transition text-xs px-1.5 py-0.5 text-white bg-black rounded-sm absolute bottom-[calc(100%+0.5rem)] md:bottom-auto md:top-[calc(100%+1rem)] left-1/2 -translate-x-1/2 translate-y-1 opacity-0  pointer-events-none;
 }
 
-[disabled] {
+.gutentap [disabled] {
   @apply text-gray-300 cursor-default;
 }
 
-.ProseMirror > * {
+.gutentap .ProseMirror > * {
   @apply max-w-2xl mx-auto max-sm:px-4;
 }
 
-[data-block-width="wide"] {
+.gutentap [data-block-width="wide"] {
   @apply max-w-4xl  !important;
 }
 
-[data-block-width="full"] {
+.gutentap [data-block-width="full"] {
   @apply max-w-none px-0 !important;
 }
 
-.hide-empty:empty {
+.gutentap .hide-empty:empty {
   display: none !important;
 }
 
-.ProseMirror:focus-visible {
+.gutentap .ProseMirror:focus-visible {
   outline: none;
 }
 
-.ProseMirror > *:first-child {
+.gutentap .ProseMirror > *:first-child {
   margin-top: 0;
 }
 
-.ProseMirror-gapcursor {
+.gutentap .ProseMirror-gapcursor {
   @apply mx-auto mt-6 block relative !important;
 }
 
-.ProseMirror-gapcursor:after {
+.gutentap .ProseMirror-gapcursor:after {
   @apply block relative border-t-0 border-l h-6 border-black !important;
 }
 
-.ProseMirror table p {
+.gutentap .ProseMirror table p {
   @apply my-0;
 }
 
-.ProseMirror table p + p {
+.gutentap .ProseMirror table p + p {
   @apply mt-2;
 }
 
-blockquote .ProseMirror-trailingBreak {
+.gutentap blockquote .ProseMirror-trailingBreak {
   display: none;
 }
 
-.ProseMirror p.is-editor-empty:first-child::before {
+.gutentap .ProseMirror p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
   float: left;
   color: #adb5bd;
@@ -75,11 +75,11 @@ blockquote .ProseMirror-trailingBreak {
   height: 0;
 }
 
-.ProseMirror-selectednode {
+.gutentap .ProseMirror-selectednode {
   outline: 2px solid lightblue;
 }
 
-.ProseMirror p.is-empty::before {
+.gutentap .ProseMirror p.is-empty::before {
   color: #adb5bd;
   content: attr(data-placeholder);
   float: left;
@@ -87,7 +87,7 @@ blockquote .ProseMirror-trailingBreak {
   pointer-events: none;
 }
 
-.ProseMirror table {
+.gutentap .ProseMirror table {
   border-collapse: collapse;
   table-layout: fixed;
   width: 100%;
@@ -95,8 +95,8 @@ blockquote .ProseMirror-trailingBreak {
   overflow: hidden;
 }
 
-.ProseMirror td,
-.ProseMirror th {
+.gutentap .ProseMirror td,
+.gutentap .ProseMirror th {
   min-width: 1em;
   border: 1px solid #ced4da;
   padding: 0.2rem 0.5rem;
@@ -105,8 +105,8 @@ blockquote .ProseMirror-trailingBreak {
   position: relative;
 }
 
-.ProseMirror td > *,
-.ProseMirror th > * {
+.gutentap .ProseMirror td > *,
+.gutentap .ProseMirror th > * {
   margin-bottom: 0;
 }
 
@@ -116,7 +116,7 @@ blockquote .ProseMirror-trailingBreak {
   @apply bg-slate-50;
 } */
 
-.ProseMirror .selectedCell:after {
+.gutentap .ProseMirror .selectedCell:after {
   z-index: 2;
   position: absolute;
   content: "";
@@ -128,11 +128,11 @@ blockquote .ProseMirror-trailingBreak {
   pointer-events: none;
 }
 
-.ProseMirror table p {
+.gutentap .ProseMirror table p {
   margin: 0;
 }
 
-.column-resize-handle {
+.gutentap .column-resize-handle {
   position: absolute;
   right: -2px;
   top: 0;
@@ -142,11 +142,11 @@ blockquote .ProseMirror-trailingBreak {
   pointer-events: none;
 }
 
-.tableWrapper {
+.gutentap .tableWrapper {
   overflow-x: auto;
 }
 
-.resize-cursor {
+.gutentap .resize-cursor {
   cursor: ew-resize;
   cursor: col-resize;
 }
