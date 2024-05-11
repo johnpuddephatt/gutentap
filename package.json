@@ -1,6 +1,6 @@
 {
   "name": "gutentap",
-  "version": "0.1.88",
+  "version": "0.1.89",
   "private": false,
   "type": "module",
   "files": [
@@ -27,6 +27,7 @@
     "build:demo": "npx vite build -c vite.demo.config.js"
   },
   "dependencies": {
+    "@babel/eslint-parser": "^7.24.5",
     "@justinribeiro/lite-youtube": "^1.5.0",
     "@tiptap/extension-blockquote": "^2.0.0",
     "@tiptap/extension-bubble-menu": "^2.0.0",
@@ -55,13 +56,13 @@
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
-    "@babel/eslint-parser": "^7.12.16",
     "@tailwindcss/typography": "^0.5.7",
+    "@typescript-eslint/parser": "^7.5.0",
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-eslint": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
     "autoprefixer": "^10.4.12",
-    "eslint": "^7.32.0",
+    "eslint": "^8.56.0",
     "eslint-plugin-vue": "^8.0.3",
     "postcss": "^8.4.17",
     "tailwindcss": "^3.1.8"
@@ -80,6 +81,11 @@
     },
     "rules": {}
   },
+  "eslintIgnore": [
+    "dist",
+    "node_modules",
+    "lib"
+  ],
   "browserslist": [
     "> 1%",
     "last 2 versions",

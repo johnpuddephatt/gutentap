@@ -31,3 +31,5 @@ Mode can be json or html.
 - [x] block width tool double icon when applied to blockquote (look at logic for showing icons... isActiveTest which uses .isActive() https://tiptap.dev/api/editor#is-active we can specify block type which should help – feed in top level block? )
 - [x] explore fix for buggyness of inline\* for tablecell content
 - [x] harmonize approach for finding/selecting parent block - e.g. https://github.com/ueberdosis/tiptap/blob/8c6751f0c638effb22110b62b40a1632ea6867c9/packages/core/src/commands/deleteNode.ts
+- [x] Allow dynamic placeholders
+- [x] Enable editable/readonly mode toggling

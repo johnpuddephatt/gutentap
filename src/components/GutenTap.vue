@@ -364,27 +364,27 @@ export default {
     },
     extensions: {
       type: Array,
-      default: [],
+      default: () => [],
     },
     blockTools: {
       type: Array,
-      default: [],
+      default: () => [],
     },
     inlineTools: {
       type: Array,
-      default: [],
+      default: () => [],
     },
     alignmentTools: {
       type: Array,
-      default: [],
+      default: () => [],
     },
     blockWidthTypes: {
       type: Array,
-      default: ["horizontalRule", "blockquote", "youtube"],
+      default: () => ["horizontalRule", "blockquote", "youtube"],
     },
     variantsTypes: {
       type: Array,
-      default: [
+      default: () => [
         "paragraph",
         "heading",
         "horizontalRule",
