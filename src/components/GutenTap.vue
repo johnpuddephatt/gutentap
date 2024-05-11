@@ -348,6 +348,9 @@ import { tableRowTools, tableColumnTools } from "../tools/table-tools";
 export default {
   props: {
     modelValue: {},
+    editable: {
+      default: true,
+    },
     editorClass: {
       type: String,
     },
@@ -507,6 +510,8 @@ export default {
           }
         : this.modelValue
     );
+
+    this.editor.setEditable(this.editable);
   },
 
   beforeUnmount() {
@@ -516,6 +521,9 @@ export default {
   watch: {
     topLevelNodeType() {
       this.currentBlockTool = this.getCurrentBlockTool();
+    },
+    editable() {
+      this.editor.setEditable(this.editable);
     },
   },
 
@@ -539,7 +547,7 @@ export default {
     },
 
     shouldShowMainToolbar() {
-      return this.editor.isActive() && this.modelValue;
+      return this.editable && this.editor.isActive() && this.modelValue;
     },
 
     updateToolbar() {
@@ -597,7 +605,7 @@ export default {
     },
 
     tableIsActive() {
-      return this.getTopLevelNodeType() == "table";
+      return this.editable && this.getTopLevelNodeType() == "table";
     },
 
     moveNode(dir = "UP") {

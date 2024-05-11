@@ -51,6 +51,21 @@
   @apply mx-auto mt-6 block relative !important;
 }
 
+.gutentap .prosemirror-dropcursor-block {
+  animation: scaleIn 0.3s ease-out forwards;
+  transform: scale(0);
+  @apply bg-slate-400 h-1 rounded-full !important;
+}
+
+@keyframes scaleIn {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
 .gutentap .ProseMirror-gapcursor:after {
   @apply block relative border-t-0 border-l h-6 border-black !important;
 }
