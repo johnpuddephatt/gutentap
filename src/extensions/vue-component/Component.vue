@@ -7,9 +7,11 @@
 
     <div contenteditable="false" class="content">
       <button @click.prevent="increase">
-        This button has been clicked {{ node.attrs.count }} times.
+        This button has been clicked {{ node.attrs.count }} times!
       </button>
     </div>
+    <node-view-content class="content" />
+    <hr />
     <node-view-content class="content" />
   </node-view-wrapper>
 </template>

@@ -334,7 +334,7 @@ import { mergeArrays } from "../utils/utils";
 import BlockWidth from "../extensions/block-width";
 import { Youtube } from "../extensions/youtube";
 import { TrailingNode } from "../extensions/trailing-node";
-
+import { InsertBetween } from "../extensions/insert-between";
 import Variants from "../extensions/variants";
 
 import Commands from "./commands";
@@ -446,6 +446,7 @@ export default {
           content: "paragraph",
         }),
         TrailingNode,
+        InsertBetween,
         Subscript,
         Superscript,
         Highlight,

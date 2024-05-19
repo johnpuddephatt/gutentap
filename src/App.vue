@@ -6,7 +6,6 @@
           class="flex flex-row gap-4 items-center fixed lg:absolute top-4 z-20 right-4"
         >
           <button
-            :key="toggleEditable"
             @click.prevent="editable = !editable"
             v-text="editable ? 'Editable' : 'Read only'"
             class="rounded-full border-2 py-2 px-4"

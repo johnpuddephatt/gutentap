@@ -66,11 +66,14 @@
   }
 }
 
+.editor-node-tools {
+  @apply absolute mt-1.5 h-4 text-slate-500 hover:before:duration-500  before:scale-x-0 hover:before:delay-500 after:content-["+"] hover:before:transition hover:after:duration-500 hover:after:delay-500 hover:after:transition after:scale-0 hover:after:scale-100 hover:before:scale-x-100  before:block before:absolute before:h-0.5 before:top-1/2 before:-translate-y-1/2 before:left-0 before:right-0 before:bg-slate-200 text-sm leading-none after:h-5 after:w-5 after:absolute after:rounded after:block after:bg-white after:border-slate-200  after:border-2 after:left-1/2 after:top-1/2 after:-translate-x-1/2 after:-translate-y-1/2;
+}
+
 .gutentap .ProseMirror-gapcursor:after {
   @apply block relative border-t-0 border-l h-6 border-black !important;
 }
-
-.gutentap .ProseMirror table p {
+^ .gutentap .ProseMirror table p {
   @apply my-0;
 }
 

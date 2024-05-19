@@ -6,8 +6,15 @@ import { Selection } from "@tiptap/pm/state";
 export const GetTopLevelBlockCoords = function (view) {
   const $pos = view.state.selection.$from;
   let from = $pos.before(1);
+
   let coords = view.coordsAtPos(from);
-  return new DOMRect(coords.left, coords.top, 0, 0);
+
+  return new DOMRect(
+    coords.left,
+    coords.top,
+    coords.right - coords.left,
+    coords.bottom - coords.top
+  );
 };
 
 export const GetTableRowCoords = function (view) {
