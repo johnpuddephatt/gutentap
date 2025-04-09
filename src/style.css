@@ -73,7 +73,8 @@
 .gutentap .ProseMirror-gapcursor:after {
   @apply block relative border-t-0 border-l h-6 border-black !important;
 }
-^ .gutentap .ProseMirror table p {
+
+.gutentap .ProseMirror table p {
   @apply my-0;
 }
 
