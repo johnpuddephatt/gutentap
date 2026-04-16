@@ -59,6 +59,7 @@
 
     <bubble-menu
       pluginKey="mainMenu"
+      @dragstart="onDragStart($event)"
       @dragend="endDragging($event)"
       :draggable="dragging"
       :should-show="shouldShowMainToolbar"
@@ -85,10 +86,7 @@
         <button
           @click.prevent
           @mousedown="startDragging($event)"
-          @mouseup="
-            draggedNodePosition = false;
-            dragging = false;
-          "
+          @mouseup="endDragging()"
           class="hidden md:block ml-1 my-2 hover:bg-slate-100 rounded"
           :class="{
             'cursor-grab': !dragging,
@@ -407,6 +405,7 @@ export default {
     return {
       dragging: false,
       draggedNodePosition: null,
+      hoverNodePosition: null,
       editor: null,
       allBlockTools: mergeArrays(defaultBlockTools(), this.blockTools),
       allInlineTools: mergeArrays(defaultInlineTools(), this.inlineTools),
@@ -586,27 +585,75 @@ export default {
 
     startDragging(event) {
       let coords = { left: event.clientX, top: event.clientY + 48 };
-      this.draggedNodePosition = this.editor.view.posAtCoords(coords).pos;
+      this.draggedNodePosition =
+        this.editor.view.posAtCoords(coords)?.pos ?? null;
       this.dragging = true;
+
+      this._dragOverHandler = (e) => {
+        const hit = this.editor.view.posAtCoords({
+          left: e.clientX,
+          top: e.clientY,
+        });
+        if (hit) this.hoverNodePosition = hit.pos;
+      };
+      this.editor.view.dom.addEventListener("dragover", this._dragOverHandler);
     },
 
-    endDragging(event) {
-      let targetNodeFromCoords = this.editor.view.posAtCoords({
-        left: event.clientX,
-        top: event.clientY + 20,
-      });
+    onDragStart(event) {
+      if (this.draggedNodePosition === null) return;
 
-      if (targetNodeFromCoords) {
+      // Resolve the top-level block's exact start position
+      const $pos = this.editor.state.doc.resolve(this.draggedNodePosition);
+      const topLevelPos = $pos.depth >= 1 ? $pos.before(1) : 0;
+      let nodeEl = this.editor.view.nodeDOM(topLevelPos);
+      if (!nodeEl) return;
+
+      // nodeDOM can return a text node in some cases; walk up to nearest element
+      if (nodeEl.nodeType !== Node.ELEMENT_NODE) {
+        nodeEl = nodeEl.parentElement;
+        if (!nodeEl) return;
+      }
+
+      // Wrap clone in .gutentap > [editorClass] to replicate the CSS cascade
+      // that gives headings, prose etc. their styles.
+      const wrapper = document.createElement("div");
+      wrapper.className = "gutentap";
+      wrapper.style.cssText = `
+        position: fixed;
+        top: -9999px;
+        left: -9999px;
+        opacity: 0.6;
+        pointer-events: none;
+      `;
+
+      const inner = document.createElement("div");
+      inner.className = this.editorClass ?? "prose";
+      inner.style.cssText = `width: ${nodeEl.offsetWidth}px; margin: 0;`;
+      inner.appendChild(nodeEl.cloneNode(true));
+      wrapper.appendChild(inner);
+      document.body.appendChild(wrapper);
+
+      event.dataTransfer.setDragImage(wrapper, 20, 20);
+      requestAnimationFrame(() => wrapper.remove());
+    },
+
+    endDragging() {
+      if (this.hoverNodePosition !== null && this.draggedNodePosition !== null) {
         DragNode({
           view: this.editor.view,
           state: this.editor.state,
           draggedNodePosition: this.draggedNodePosition,
-          targetNodePosition: targetNodeFromCoords.pos,
+          targetNodePosition: this.hoverNodePosition,
         });
       }
 
+      this.editor.view.dom.removeEventListener(
+        "dragover",
+        this._dragOverHandler
+      );
       this.dragging = false;
-      this.draggedNode = null;
+      this.draggedNodePosition = null;
+      this.hoverNodePosition = null;
     },
 
     tableIsActive() {
